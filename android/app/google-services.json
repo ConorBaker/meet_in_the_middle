@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "456011857285",
+    "firebase_url": "https://meetinthemiddle-1de53.firebaseio.com",
+    "project_id": "meetinthemiddle-1de53",
+    "storage_bucket": "meetinthemiddle-1de53.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:456011857285:android:baaf018c180289518918ec",
+        "android_client_info": {
+          "package_name": "com.example.meet_in_the_middle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "456011857285-uho9ef9tikbnhkcv650lip4gn0j4m933.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9Wu90MA5NzqwyytL5CFG9hWwRgD8TNN4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "456011857285-uho9ef9tikbnhkcv650lip4gn0j4m933.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
