@@ -19,19 +19,33 @@ class _SingInState extends State<SingIn> {
         centerTitle: true,
         backgroundColor: Colors.grey[850],
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-        child: RaisedButton.icon(onPressed: () async {
+      body: Column(
+
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            CircleAvatar(
+              backgroundColor: Colors.grey[900],
+              backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
+              radius: 100,
+            ),
+            Divider(
+              height: 100,
+              color: Colors.grey[900],
+            ),
+         RaisedButton.icon(onPressed: () async {
             dynamic result = await _auth.signInAnon();
             if(result == null){
               print('error sigining in');
             }else{
               print('sining in');
+              print(result);
             }
         },
-            icon: Icon(Icons.account_circle),label: Text(' Log In Anon'),
+            icon: Icon(Icons.account_circle),label: Text('Log In Anonymously'),
           ),
-        ),
+        ]
+      ),
       );
   }
 }
