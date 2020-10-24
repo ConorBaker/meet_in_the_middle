@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meet_in_the_middle/Pages/authenticate.dart';
 import 'package:meet_in_the_middle/Pages/home.dart';
 
 class Wrapper extends StatelessWidget {
@@ -7,6 +8,6 @@ class Wrapper extends StatelessWidget {
 
 
 
-    return Home();
+    return Authenticate();
   }
 }
