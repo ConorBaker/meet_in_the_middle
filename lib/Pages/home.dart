@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'file:///C:/Users/Conor/AndroidStudioProjects/meet_in_the_middle/lib/services/auth.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -6,14 +7,26 @@ class Home extends StatefulWidget {
 }
 
 class Home_State extends State<Home> {
+
+  final AuthService  _auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
         title: Text('Meet In The Middle'),
-        centerTitle: true,
         backgroundColor: Colors.grey[850],
+        actions: <Widget>[
+          FlatButton.icon(
+            textColor: Colors.white,
+             icon: Icon(Icons.person),
+            label: Text('Logout'),
+            onPressed: () async{
+              await _auth.signOut();
+            },
+          ),
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -32,16 +45,6 @@ class Home_State extends State<Home> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[],
-          ),
-          RaisedButton.icon(onPressed: (){
-
-  },
-            icon: Icon(Icons.account_circle),label: Text('Login'),
-          ),
-          RaisedButton.icon(onPressed: (){
-            Navigator.pushNamed(context, '/register');
-          },
-            icon: Icon(Icons.account_circle),label: Text('Register'),
           ),
         ],
       ),
