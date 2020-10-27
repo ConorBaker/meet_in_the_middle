@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'file:///C:/Users/Conor/AndroidStudioProjects/meet_in_the_middle/lib/authenticate/sign_in.dart';
+import 'package:meet_in_the_middle/authenticate/sign_in.dart';
 import 'package:meet_in_the_middle/authenticate/register.dart';
 
 class Authenticate extends StatefulWidget {
@@ -8,11 +8,18 @@ class Authenticate extends StatefulWidget {
 }
 
 class _AuthenticateState extends State<Authenticate> {
+
+  bool showSignIn = true;
+  void toggleView(){
+    setState(() => showSignIn =!showSignIn);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Register()
-    );
-
+    if(showSignIn){
+      return SignIn(toggleView: toggleView);
+    }else{
+      return Register(toggleView: toggleView);
+    }
   }
 }
