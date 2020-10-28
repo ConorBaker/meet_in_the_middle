@@ -81,13 +81,15 @@ class _RegisterState extends State<Register> {
                   onPressed: () async {
                     if(_formKey.currentState.validate()){
                       dynamic result = await _auth.registerWithEmailAndPassword(email, password);
-                      if(result = null){
+                      if(result == null){
                         setState(() => error = 'Please Supply A Valid Email Address');
                       }
                     }
                   }
                   ),
-
+              SizedBox(height: 12),
+              Text(error,
+                  style: TextStyle(color: Colors.red, fontSize: 14))
             ],
           ),
         )
