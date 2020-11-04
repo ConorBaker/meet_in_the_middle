@@ -1,5 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'file:///C:/Users/Conor/AndroidStudioProjects/meet_in_the_middle/lib/services/auth.dart';
+import 'package:meet_in_the_middle/services/auth.dart';
+import 'package:meet_in_the_middle/services/database.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:meet_in_the_middle/Pages/user_list.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,7 +17,9 @@ class Home_State extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return StreamProvider<QuerySnapshot>.value(
+      value: DataBaseService().users,
+      child: Scaffold(
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
         title: Text('Meet In The Middle'),
@@ -35,18 +42,20 @@ class Home_State extends State<Home> {
           CircleAvatar(
             backgroundColor: Colors.grey[900],
             backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
-            radius: 100,
+            radius: 50,
           ),
           Divider(
             height: 100,
             color: Colors.grey[900],
           ),
+          UserList(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[],
           ),
         ],
+      ),
       ),
     );
   }

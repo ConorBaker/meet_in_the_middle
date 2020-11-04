@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'file:///C:/Users/Conor/AndroidStudioProjects/meet_in_the_middle/lib/services/auth.dart';
+import 'package:meet_in_the_middle/shared/constants.dart';
+import 'package:meet_in_the_middle/shared/loading.dart';
 
 class SignIn extends StatefulWidget {
   final Function toggleView;
@@ -13,6 +15,7 @@ class _SignInState extends State<SignIn> {
 
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
+  bool loading = false;
 
   String email = '';
   String password = '';
@@ -20,7 +23,7 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return loading ?  Loading() : Scaffold(
       backgroundColor: Colors.grey[800],
       appBar: AppBar(
         title: Text('Meet In The Middle'),
@@ -45,27 +48,29 @@ class _SignInState extends State<SignIn> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              CircleAvatar(
+            /*  CircleAvatar(
                 backgroundColor: Colors.grey[800],
                 backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
-                radius: 50,
-              ),
+                radius: 20,
+              ),*/
               Divider(
                 height: 0,
                 color: Colors.grey[800],
               ),
               SizedBox(height: 10),
               TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: 'Email'),
                 validator: (val) => val.isEmpty ? 'Enter an Email' : null,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 onChanged: (val){
                   setState(() => email = val);
                 },
               ),
               SizedBox(height: 10),
               TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: 'Password'),
                 validator: (val) => val.length < 6 ? 'Enter a password at least 6 characters long' : null,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 obscureText: true,
                 onChanged: (val){
                   setState(() => password = val);
@@ -80,9 +85,13 @@ class _SignInState extends State<SignIn> {
                 ),
                   onPressed: () async{
                     if(_formKey.currentState.validate()){
+                      setState(() => loading = true);
                       dynamic result = await _auth.signInWithEmailAndPassword(email, password);
                       if(result == null){
-                        setState(() => error = 'Failed To Sign In');
+                        setState(() {
+                          error = 'Failed To Sign In';
+                          loading = false;
+                        });
                       }
                     }
              }),

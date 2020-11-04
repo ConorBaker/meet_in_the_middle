@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meet_in_the_middle/services/auth.dart';
+import 'package:meet_in_the_middle/shared/constants.dart';
+import 'package:meet_in_the_middle/shared/loading.dart';
 
 class Register extends StatefulWidget {
   final Function toggleView;
@@ -13,6 +15,7 @@ class _RegisterState extends State<Register> {
 
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
+  bool loading = false;
 
   String email = '';
   String password = '';
@@ -20,7 +23,7 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return loading ? Loading() : Scaffold(
         backgroundColor: Colors.grey[800],
         appBar: AppBar(
           title: Text('Meet In The Middle'),
@@ -45,27 +48,29 @@ class _RegisterState extends State<Register> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              CircleAvatar(
+            /*  CircleAvatar(
                 backgroundColor: Colors.grey[800],
                 backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
-                radius: 50,
-              ),
+                radius: 20,
+              ),*/
               Divider(
                 height: 0,
                 color: Colors.grey[800],
               ),
               SizedBox(height: 10),
               TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: 'Email'),
                 validator: (val) => val.isEmpty ? 'Enter an Email' : null,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 onChanged: (val) {
                   setState(() => email = val);
                 },
               ),
               SizedBox(height: 10),
               TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: 'Password'),
                 validator: (val) => val.length < 6 ? 'Enter a password at least 6 characters long' : null,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 obscureText: true,
                 onChanged: (val) {
                   setState(() => password = val);
@@ -80,9 +85,15 @@ class _RegisterState extends State<Register> {
                   ),
                   onPressed: () async {
                     if(_formKey.currentState.validate()){
+                      setState(() {
+                        loading = true;
+                      });
                       dynamic result = await _auth.registerWithEmailAndPassword(email, password);
                       if(result == null){
-                        setState(() => error = 'Please Supply A Valid Email Address');
+                        setState(() {
+                          loading = false;
+                          error = 'Please Supply A Valid Email Address';
+                        });
                       }
                     }
                   }
