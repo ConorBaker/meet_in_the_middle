@@ -42,7 +42,7 @@ class Home_State extends State<Home> {
           CircleAvatar(
             backgroundColor: Colors.grey[900],
             backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
-            radius: 50,
+            radius: 150,
           ),
           Divider(
             height: 100,
