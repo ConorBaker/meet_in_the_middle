@@ -8,7 +8,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="meet_in_the_middle"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/Logo.png">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

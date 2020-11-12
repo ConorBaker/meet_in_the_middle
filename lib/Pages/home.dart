@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:meet_in_the_middle/Pages/user_list.dart';
+import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/auth.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:meet_in_the_middle/Pages/user_list.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -17,7 +17,7 @@ class Home_State extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<QuerySnapshot>.value(
+    return StreamProvider<List<Users>>.value(
       value: DataBaseService().users,
       child: Scaffold(
       backgroundColor: Colors.grey[900],
@@ -36,24 +36,22 @@ class Home_State extends State<Home> {
         ],
       ),
       body: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          CircleAvatar(
+          UserList(),
+          /*CircleAvatar(
             backgroundColor: Colors.grey[900],
             backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
             radius: 150,
-          ),
-          Divider(
-            height: 100,
-            color: Colors.grey[900],
-          ),
-          UserList(),
-          Row(
+          ),*/
+
+          /*Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[],
-          ),
+          ),*/
         ],
       ),
       ),

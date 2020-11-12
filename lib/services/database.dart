@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:meet_in_the_middle/models/users.dart';
 
 class DataBaseService {
 
@@ -14,8 +15,18 @@ class DataBaseService {
     });
   }
 
+  List<Users> _familyListFromSnapshot(QuerySnapshot snapshot){
+    return snapshot.documents.map((doc){
+      return Users(
+          surname: doc.data['surname'] ?? '',
+        age: doc.data['age'] ?? 0
+      );
+    }).toList();
+  }
+
   //get user stream
-  Stream<QuerySnapshot> get users{
-    return userCollection.snapshots();
+  Stream<List<Users>> get users{
+    return userCollection.snapshots()
+        .map(_familyListFromSnapshot);
   }
 }
