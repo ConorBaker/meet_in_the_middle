@@ -41,6 +41,16 @@ class Home_State extends State<Home> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           UserList(),
+          RaisedButton(
+              color: Colors.grey[850],
+              child: Text(
+                'Location',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async{
+                       
+              }),
+
           /*CircleAvatar(
             backgroundColor: Colors.grey[900],
             backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
