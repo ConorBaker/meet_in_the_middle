@@ -13,7 +13,6 @@ class _UserListState extends State<UserList> {
   @override
   Widget build(BuildContext context) {
     final users = Provider.of<List<Users>>(context) ?? [];
-
     return ListView.builder(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,

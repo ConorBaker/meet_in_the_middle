@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:meet_in_the_middle/shared/constants.dart';
@@ -19,9 +21,11 @@ class _SettingsFormState extends State<SettingsForm> {
 
   @override
   Widget build(BuildContext context) {
-
     final user = Provider.of<User>(context);
-    var _controller = TextEditingController();
+    Location location = new Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
 
     return StreamBuilder<UserData>(
       stream: DataBaseService(uid: user.uid).userData,
@@ -48,8 +52,10 @@ class _SettingsFormState extends State<SettingsForm> {
                   ),
                   onPressed: () async{
                     if(_formKey.currentState.validate()){
+                      _serviceEnabled = await location.serviceEnabled();
+                      _locationData = await location.getLocation();
                       await DataBaseService(uid: user.uid).updateUserData(
-                          _currentName ?? userData.name, userData.lat, userData.lng
+                          _currentName ?? userData.name, _locationData.latitude, _locationData.longitude, userData.token
                       );
                       Navigator.pop(context);
                     }

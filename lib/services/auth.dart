@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 class AuthService {
@@ -31,9 +32,11 @@ class AuthService {
     try{
       AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = result.user;
+      final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
       //create new document for the user with uid
-      await DataBaseService(uid: user.uid).updateUserData('New Family Member',0,0);
+      String token = await _firebaseMessaging.getToken();
+      await DataBaseService(uid: user.uid).updateUserData('New Family Member',0,0,token);
 
       return _userFromFireBaseUser(user);
     }catch(e){

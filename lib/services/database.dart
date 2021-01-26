@@ -11,11 +11,12 @@ class DataBaseService {
 
   final CollectionReference userCollection = Firestore.instance.collection('users');
 
-  Future updateUserData(String name, double lat, double lng) async {
+  Future updateUserData(String name, double lat, double lng,String token) async {
     return await userCollection.document(uid).setData({
-      'name' : name,
-      'lat' : lat,
-      'lng' : lng
+      'name' : name ?? '',
+      'lat' : lat ?? '',
+      'lng' : lng ?? '',
+      'token' : token ?? ''
     });
   }
 
@@ -23,9 +24,11 @@ class DataBaseService {
   UserData _userDataFromSnapShot(DocumentSnapshot snapshot){
     return UserData(
         uid: uid,
-        name: snapshot.data['name'],
-        lat: snapshot.data['lat'],
-        lng: snapshot.data['lng']
+        name: snapshot.data['name'] ?? '',
+        lat: snapshot.data['lat'] ?? '',
+        lng: snapshot.data['lng'] ?? '',
+        token: snapshot.data['token'] ?? '',
+
     );
   }
 
@@ -34,11 +37,11 @@ class DataBaseService {
       return Users(
           name: doc.data['name'] ?? '',
           lat: doc.data['lat'] ?? '',
-          lng: doc.data['lng'] ?? ''
+          lng: doc.data['lng'] ?? '',
+          token: doc.data['token'] ?? ''
       );
     }).toList();
   }
-
 
   //get user stream
   Stream<List<Users>> get users{
