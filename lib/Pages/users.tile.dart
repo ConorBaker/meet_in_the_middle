@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meet_in_the_middle/Pages/map.dart';
+import 'package:meet_in_the_middle/main.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 
 class UserTile extends StatelessWidget {
@@ -7,9 +9,6 @@ class UserTile extends StatelessWidget {
   UserTile({this.user});
   @override
   Widget build(BuildContext context) {
-    print('Under This');
-    print(user.surname);
-    print(user.age);
     return Padding(
         padding: EdgeInsets.only(top: 10),
         child: Card(
@@ -20,8 +19,13 @@ class UserTile extends StatelessWidget {
               backgroundColor: Colors.grey[900],
               backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
             ),
-            title: Text(user.surname),
-            subtitle: Text('Aged ${user.age}'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MapScreen(user.lat,user.lng)),
+              );
+            },
+            title: Text(user.name),
           ),
         )
     );

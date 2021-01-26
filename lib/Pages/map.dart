@@ -1,67 +1,43 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
+class MapScreen extends StatefulWidget {
+  final double latitude;
+  final double longitude;
+  MapScreen(this.latitude, this.longitude);
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Google Maps Demo',
-      home: MapSample(),
-    );
-  }
+  MapSampleState createState() => MapSampleState();
 }
 
-class MapSample extends StatefulWidget {
-  @override
-  State<MapSample> createState() => MapSampleState();
-}
-
-class MapSampleState extends State<MapSample> {
-
+class MapSampleState extends State<MapScreen> {
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
   GoogleMapController _controller;
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(6.2603, 53.3498),
-    zoom: 14.4746,
-  );
-
-  static final CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
-
   void getCurrentLocation() async {
     try {
-
       var location = await _locationTracker.getLocation();
-
-
 
       if (_locationSubscription != null) {
         _locationSubscription.cancel();
       }
 
-
-      _locationSubscription = _locationTracker.onLocationChanged().listen((newLocalData) {
-        if (_controller != null) {
-          _controller.animateCamera(CameraUpdate.newCameraPosition(new CameraPosition(
-              bearing: 192.8334901395799,
-              target: LatLng(newLocalData.latitude, newLocalData.longitude),
-              tilt: 0,
-              zoom: 18.00)));
-        }
-      });
-
+      _locationSubscription =
+          _locationTracker.onLocationChanged().listen((newLocalData) {
+            if (_controller != null) {
+              _controller.animateCamera(
+                  CameraUpdate.newCameraPosition(new CameraPosition(
+                      bearing: 192.8334901395799,
+                      target: LatLng(
+                          newLocalData.latitude, newLocalData.longitude),
+                      tilt: 0,
+                      zoom: 18.00)));
+            }
+          });
     } on PlatformException catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
         debugPrint("Permission Denied");
@@ -69,22 +45,26 @@ class MapSampleState extends State<MapSample> {
     }
   }
 
+ /* void _onMapCreate(GoogleMapController cntrl) {
+    _controller = cntrl;
+    _controller.animateCamera(
+        CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(l.latitude, l.longitude), zoom: 15),
+        ),
+      );
+  }
+*/
 
   @override
   Widget build(BuildContext context) {
+     final CameraPosition cPos = CameraPosition(
+      target: LatLng(widget.latitude, widget.longitude),
+      zoom: 14.4746,
+    );
     return new Scaffold(
       body: GoogleMap(
         mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-      _controller = controller;
-    },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.location_searching),
-        onPressed: () {
-          getCurrentLocation();
-        }
+        initialCameraPosition: cPos,
+        //onMapCreated: _onMapCreate,
       ),
     );
   }

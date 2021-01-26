@@ -33,7 +33,8 @@ class AuthService {
       FirebaseUser user = result.user;
 
       //create new document for the user with uid
-      await DataBaseService(uid: user.uid).updateUserData('', 0);
+      await DataBaseService(uid: user.uid).updateUserData('New Family Member',0,0);
+
       return _userFromFireBaseUser(user);
     }catch(e){
       print(e.toString());

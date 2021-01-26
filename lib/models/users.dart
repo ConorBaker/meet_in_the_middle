@@ -1,8 +1,11 @@
 class Users{
 
-  final String surname;
-  final int age;
+  final String name;
+  final double lat;
+  final double lng;
 
-  Users({this.surname, this.age});
+  Users({this.name,this.lat, this.lng});
+
+
 
 }
