@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:meet_in_the_middle/models/user.dart';
+import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:meet_in_the_middle/shared/constants.dart';
 import 'package:meet_in_the_middle/shared/loading.dart';
@@ -55,7 +56,7 @@ class _SettingsFormState extends State<SettingsForm> {
                       _serviceEnabled = await location.serviceEnabled();
                       _locationData = await location.getLocation();
                       await DataBaseService(uid: user.uid).updateUserData(
-                          _currentName ?? userData.name, _locationData.latitude, _locationData.longitude, userData.token
+                          userData.uid, _currentName ?? userData.name, _locationData.latitude, _locationData.longitude, userData.token
                       );
                       Navigator.pop(context);
                     }

@@ -12,12 +12,13 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   @override
   Widget build(BuildContext context) {
-    final users = Provider.of<List<Users>>(context) ?? [];
-    return ListView.builder(
+    final users = Provider.of<List<UserData>>(context) ?? [];
+    return
+      ListView.builder(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
-      itemCount: users.length,
-      itemBuilder: (context, index){
+        itemCount: users.length,
+        itemBuilder: (context, index){
         return UserTile(user: users[index]);
       }
     );

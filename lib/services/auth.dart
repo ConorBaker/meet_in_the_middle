@@ -36,7 +36,7 @@ class AuthService {
 
       //create new document for the user with uid
       String token = await _firebaseMessaging.getToken();
-      await DataBaseService(uid: user.uid).updateUserData('New Family Member',0,0,token);
+      await DataBaseService(uid: user.uid).updateUserData(user.uid.toString(),'New Family Member',0,0,token);
 
       return _userFromFireBaseUser(user);
     }catch(e){

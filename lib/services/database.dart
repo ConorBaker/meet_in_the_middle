@@ -10,9 +10,11 @@ class DataBaseService {
   DataBaseService({this.uid});
 
   final CollectionReference userCollection = Firestore.instance.collection('users');
+  final CollectionReference chatRoomCollection = Firestore.instance.collection('chatrooms');
 
-  Future updateUserData(String name, double lat, double lng,String token) async {
+  Future updateUserData(String uId, String name, double lat, double lng,String token) async {
     return await userCollection.document(uid).setData({
+      'uId' : uId ?? '',
       'name' : name ?? '',
       'lat' : lat ?? '',
       'lng' : lng ?? '',
@@ -20,10 +22,11 @@ class DataBaseService {
     });
   }
 
+
   //UserData from snapshot
   UserData _userDataFromSnapShot(DocumentSnapshot snapshot){
     return UserData(
-        uid: uid,
+        uid: snapshot.data['uId'] ?? '',
         name: snapshot.data['name'] ?? '',
         lat: snapshot.data['lat'] ?? '',
         lng: snapshot.data['lng'] ?? '',
@@ -32,9 +35,10 @@ class DataBaseService {
     );
   }
 
-  List<Users> _familyListFromSnapshot(QuerySnapshot snapshot){
+  List<UserData> _familyListFromSnapshot(QuerySnapshot snapshot){
     return snapshot.documents.map((doc){
-      return Users(
+      return UserData(
+          uid: doc.data['uId'] ?? '',
           name: doc.data['name'] ?? '',
           lat: doc.data['lat'] ?? '',
           lng: doc.data['lng'] ?? '',
@@ -44,7 +48,7 @@ class DataBaseService {
   }
 
   //get user stream
-  Stream<List<Users>> get users{
+  Stream<List<UserData>> get users{
     return userCollection.snapshots()
         .map(_familyListFromSnapshot);
   }
@@ -55,4 +59,31 @@ class DataBaseService {
     .map(_userDataFromSnapShot);
   }
 
+  createChatRoom(String chatRoomId, Map chatRoomInfoMap) async {
+    final snapShot = await Firestore.instance
+        .collection("chatrooms")
+        .document(chatRoomId)
+        .get();
+
+    if (snapShot.exists) {
+      // chatroom already exists
+      return true;
+    } else {
+      // chatroom does not exists
+      return Firestore.instance
+          .collection("chatrooms")
+          .document(chatRoomId).setData(chatRoomInfoMap);
+    }
+  }
+
+  Future updateChatRoom(String chatRoomId, Map chatRoomInfoMap) async {
+    return await chatRoomCollection.document(chatRoomId).setData({
+      'chatRoomId' : chatRoomId,
+      //'users' : chatRoomInfoMap
+    });
+  }
+
+  Future<Stream<QuerySnapshot>> getChatRooms() async {
+    return chatRoomCollection.snapshots();
+  }
 }

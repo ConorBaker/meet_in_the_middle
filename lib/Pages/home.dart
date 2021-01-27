@@ -21,7 +21,6 @@ class Home_State extends State<Home> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -41,10 +40,13 @@ class Home_State extends State<Home> {
                   ],
                 ));
       },
-      onLaunch: (Map<String, dynamic> message) async {},
+      onLaunch: (Map<String, dynamic> message) async {
+      },
       onResume: (Map<String, dynamic> message) async {},
     );
   }
+
+
     @override
     Widget build(BuildContext context) {
       void _showSettingsPanel() {
@@ -59,7 +61,7 @@ class Home_State extends State<Home> {
             });
       }
 
-      return StreamProvider<List<Users>>.value(
+      return StreamProvider<List<UserData>>.value(
         value: DataBaseService().users,
         child: Scaffold(
           backgroundColor: Colors.grey[900],
@@ -112,17 +114,6 @@ class Home_State extends State<Home> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               UserList(),
-              /*CircleAvatar(
-                    backgroundColor: Colors.grey[900],
-                    backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
-                    radius: 150,
-                  ),*/
-
-              /*Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[],
-                  ),*/
             ],
           ),
         ),
