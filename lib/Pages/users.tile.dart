@@ -12,46 +12,36 @@ import 'package:provider/provider.dart';
 class UserTile extends StatelessWidget {
   final UserData user;
   UserTile({this.user});
-
-
-
-  sendNotifcation(String uID, String uID2) async{
-    String chatID = 'A' + "_" + 'B';
-    List<String> users = [uID,uID2];
-    Map<String, dynamic> chatMap = {
-      'users' : user,
-      'chatID' : chatID,
-    };
-    await DataBaseService(uid : uID).updateChatRoom(chatID, chatMap);
-  }
-
+  FirebaseAuth _auth;
+  String userid;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(top: 10),
-        child: Card(
-          margin: EdgeInsets.fromLTRB(20, 16, 20, 0),
-          child: ListTile(
-            leading: CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.grey[900],
-              backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
+      return Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Card(
+            margin: EdgeInsets.fromLTRB(20, 16, 20, 0),
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.grey[900],
+                backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
+              ),
+              onTap: () async{
+                _auth = FirebaseAuth.instance;
+                final FirebaseUser cUser = await _auth.currentUser();
+                userid = cUser.uid;
+                await DataBaseService(uid: user.uid).updateUserData(
+                    user.uid, user.name, user.lat, user.lng, user.token,"request-"+userid);
+                final snackBar = SnackBar(
+                    content: Text("Request Sent")
+                );
+                Scaffold.of(context).showSnackBar(snackBar);
+              },
+              title: Text(user.name),
             ),
-            onTap: () async{
-              /*
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MapScreen(user.lat,user.lng)),
-              );
+          )
+      );
+    }
 
-               */
-              final user1 = Provider.of<User>(context);
-              sendNotifcation(user1.uid,user.uid);
-            },
-            title: Text(user.name),
-          ),
-        )
-    );
-  }
 }

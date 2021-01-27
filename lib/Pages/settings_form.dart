@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 class SettingsForm extends StatefulWidget {
   @override
-  _SettingsFormState createState() => _SettingsFormState();
+_SettingsFormState createState() => _SettingsFormState();
 }
 
 class _SettingsFormState extends State<SettingsForm> {
@@ -56,7 +56,7 @@ class _SettingsFormState extends State<SettingsForm> {
                       _serviceEnabled = await location.serviceEnabled();
                       _locationData = await location.getLocation();
                       await DataBaseService(uid: user.uid).updateUserData(
-                          userData.uid, _currentName ?? userData.name, _locationData.latitude, _locationData.longitude, userData.token
+                          userData.uid, _currentName ?? userData.name, _locationData.latitude, _locationData.longitude, userData.token,""
                       );
                       Navigator.pop(context);
                     }
