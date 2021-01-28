@@ -28,6 +28,9 @@ class _SettingsFormState extends State<SettingsForm> {
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
     LocationData _locationData;
+    final List<String> pictures = ['assets/Man1.png','assets/Man2.png', 'assets/Man3.png','assets/Woman1.png','assets/Woman2.png', 'assets/Woman3.png'];
+    int selection = 0;
+
 
     return StreamBuilder<UserData>(
       stream: DataBaseService(uid: user.uid).userData,
@@ -48,7 +51,40 @@ class _SettingsFormState extends State<SettingsForm> {
                   onChanged: (val) => setState(() => _currentName = val),
                   ),
                 SizedBox(height: 10.0),
-                PictureSelector(),
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(children: [
+                    Text('Profile Picture'),
+                  ]),
+                ),
+                Container(
+                  height: 100,
+                  child: ListView.builder(
+                      padding: EdgeInsets.only(left: 10.0),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: pictures.length,
+                      itemBuilder: (BuildContext context, int index){
+                        return GestureDetector(
+                          onTap: () async{
+                            await DataBaseService(uid: user.uid).updateUserData(
+                                userData.uid, _currentName ?? userData.name, userData.lat, userData.lng, userData.token,"",pictures[index]
+                            );
+                            setState(()  {
+                              selection = index;
+                            });
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: CircleAvatar(
+                              radius: 35.0,
+                              backgroundImage: AssetImage(pictures[index]),
+                            ),
+                          ),
+                        );
+                      }),
+                ),
                 RaisedButton(
                   child: Text(
                       'Update'
@@ -58,7 +94,7 @@ class _SettingsFormState extends State<SettingsForm> {
                       _serviceEnabled = await location.serviceEnabled();
                       _locationData = await location.getLocation();
                       await DataBaseService(uid: user.uid).updateUserData(
-                          userData.uid, _currentName ?? userData.name, _locationData.latitude, _locationData.longitude, userData.token,"",""
+                          userData.uid, _currentName ?? userData.name, _locationData.latitude, _locationData.longitude, userData.token,"",userData.profileImage
                       );
                       Navigator.pop(context);
                     }
@@ -67,8 +103,8 @@ class _SettingsFormState extends State<SettingsForm> {
 
               ],
             ),
-
-          );
+            ]
+          ));
         } else{
           return Loading();
         }

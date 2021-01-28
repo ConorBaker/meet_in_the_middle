@@ -37,7 +37,6 @@ class _CategorySelectorState extends State<CategorySelector> {
               ),
             );
           }),
-
     );
   }
 }
