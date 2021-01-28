@@ -24,9 +24,13 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return loading ?  Loading() : Scaffold(
-      backgroundColor: Colors.grey[800],
+      backgroundColor: Color.fromRGBO(163,217,229,1),
       appBar: AppBar(
-        title: Text('Meet In The Middle'),
+        title: Text('Meet In The Middle',style: TextStyle(
+          fontSize: 20.0,
+          fontWeight: FontWeight.bold,
+        )),
+        elevation: 0.0,
         actions: <Widget>[
           FlatButton.icon(
               textColor: Colors.white,
@@ -38,69 +42,71 @@ class _SignInState extends State<SignIn> {
           )
         ],
         centerTitle: true,
-        backgroundColor: Colors.grey[850],
+        backgroundColor: Color.fromRGBO(163,217,229,1),
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
-        child: Form(
-          key: _formKey,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-            /*  CircleAvatar(
-                backgroundColor: Colors.grey[800],
-                backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
-                radius: 20,
-              ),*/
-              Divider(
-                height: 0,
-                color: Colors.grey[800],
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                decoration: textInputDecoration.copyWith(hintText: 'Email'),
-                validator: (val) => val.isEmpty ? 'Enter an Email' : null,
-                style: TextStyle(color: Colors.black),
-                onChanged: (val){
-                  setState(() => email = val);
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                decoration: textInputDecoration.copyWith(hintText: 'Password'),
-                validator: (val) => val.length < 6 ? 'Enter a password at least 6 characters long' : null,
-                style: TextStyle(color: Colors.black),
-                obscureText: true,
-                onChanged: (val){
-                  setState(() => password = val);
-                },
-              ),
-              SizedBox(height: 30),
-              RaisedButton(
-                color: Colors.grey[850],
-                child: Text(
-                    'Sign In',
-                  style: TextStyle(color: Colors.white),
+      body: Container(decoration: BoxDecoration(color: Color.fromRGBO(242,243,245,1),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30)
+          )),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+          child: Form(
+            key: _formKey,
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+              /*  CircleAvatar(
+                  backgroundColor: Colors.grey[800],
+                  backgroundImage: AssetImage('assets/LogoNoBlack.jpg'),
+                  radius: 20,
+                ),*/
+                SizedBox(height: 10),
+                TextFormField(
+                  decoration: textInputDecoration.copyWith(hintText: 'Email'),
+                  validator: (val) => val.isEmpty ? 'Enter an Email' : null,
+                  style: TextStyle(color: Colors.black),
+                  onChanged: (val){
+                    setState(() => email = val);
+                  },
                 ),
-                  onPressed: () async{
-                    if(_formKey.currentState.validate()){
-                      setState(() => loading = true);
-                      dynamic result = await _auth.signInWithEmailAndPassword(email, password);
-                      if(result == null){
-                        setState(() {
-                          error = 'Failed To Sign In';
-                          loading = false;
-                        });
+                SizedBox(height: 10),
+                TextFormField(
+                  decoration: textInputDecoration.copyWith(hintText: 'Password'),
+                  validator: (val) => val.length < 6 ? 'Enter a password at least 6 characters long' : null,
+                  style: TextStyle(color: Colors.black),
+                  obscureText: true,
+                  onChanged: (val){
+                    setState(() => password = val);
+                  },
+                ),
+                SizedBox(height: 30),
+                RaisedButton(
+                  color: Colors.white,
+                  child: Text(
+                      'Sign In',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                    onPressed: () async{
+                      if(_formKey.currentState.validate()){
+                        setState(() => loading = true);
+                        dynamic result = await _auth.signInWithEmailAndPassword(email, password);
+                        if(result == null){
+                          setState(() {
+                            error = 'Failed To Sign In';
+                            loading = false;
+                          });
+                        }
                       }
-                    }
-             }),
-              SizedBox(height: 12),
-              Text(error,
-              style: TextStyle(color: Colors.red, fontSize: 14))
-            ],
-          ),
-        )
+               }),
+                SizedBox(height: 12),
+                Text(error,
+                style: TextStyle(color: Colors.red, fontSize: 14))
+              ],
+            ),
+          )
+        ),
       )
       );
     //gitFix

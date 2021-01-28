@@ -14,14 +14,15 @@ class DataBaseService {
       'users');
 
   Future updateUserData(String uId, String name, double lat, double lng,
-      String token,String message) async {
+      String token,String message,String profileImage) async {
     return await userCollection.document(uid).setData({
       'uId': uId ?? '',
       'name': name ?? '',
       'lat': lat ?? '',
       'lng': lng ?? '',
       'token': token ?? '',
-      'message' : message ?? ''
+      'message' : message ?? '',
+      'profileImage' : profileImage ?? ''
     });
   }
 
@@ -35,6 +36,7 @@ class DataBaseService {
       lng: snapshot.data['lng'] ?? '',
       token: snapshot.data['token'] ?? '',
       message: snapshot.data['message'] ?? '',
+      profileImage: snapshot.data['profileImage'] ?? '',
 
     );
   }
@@ -47,7 +49,8 @@ class DataBaseService {
           lat: doc.data['lat'] ?? '',
           lng: doc.data['lng'] ?? '',
           token: doc.data['token'] ?? '',
-          message: doc.data['message'] ?? ''
+          message: doc.data['message'] ?? '',
+          profileImage: doc.data['profileImage'] ?? ''
       );
     }).toList();
   }

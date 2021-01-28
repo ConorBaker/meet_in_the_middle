@@ -7,6 +7,7 @@ import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/auth.dart';
 import 'package:meet_in_the_middle/services/database.dart';
+import 'package:meet_in_the_middle/shared/category_selector.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
@@ -17,113 +18,88 @@ class Home extends StatefulWidget {
 class Home_State extends State<Home> {
   final AuthService _auth = AuthService();
   final Firestore db = Firestore.instance;
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  Stream chatRoomsStream;
-
-
 
   @override
-  void initState() {
-    super.initState();
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        String token = await _firebaseMessaging.getToken();
-        showDialog(
-            context: context,
-            builder: (context) =>
-                AlertDialog(
-                  content: ListTile(
-                      title: Text(message['notification']['title']),
-                      subtitle: Text(message['notification']['body'])),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text('Ok'),
-                      onPressed: () => Navigator.of(context).pop(),
-                    )
-                  ],
-                ));
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-      },
-      onResume: (Map<String, dynamic> message) async {},
-    );
-  }
+  Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+    void _showSettingsPanel() {
+      Navigator.pop(context);
+      showModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
+              child: SettingsForm(),
+            );
+          });
+    }
 
-
-    @override
-    Widget build(BuildContext context) {
-      final user = Provider.of<User>(context);
-      void _showSettingsPanel() {
-        Navigator.pop(context);
-        showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return Container(
-                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
-                child: SettingsForm(),
-              );
-            });
-      }
-
-
-          return StreamProvider<List<UserData>>.value(
-            value: DataBaseService().users,
-            child: Scaffold(
-              backgroundColor: Colors.grey[900],
-              appBar: AppBar(
-                title: Text('Meet In The Middle'),
-                backgroundColor: Colors.grey[850],
-                actions: <Widget>[
-                  FlatButton.icon(
-                    textColor: Colors.white,
-                    icon: Icon(Icons.person),
-                    label: Text('Logout'),
-                    onPressed: () async {
-                      await _auth.signOut();
-                    },
-                  ),
-                ],
+    return StreamProvider<List<UserData>>.value(
+      value: DataBaseService().users,
+      child: Scaffold(
+        backgroundColor: Color.fromRGBO(163, 217, 229, 1),
+        appBar: AppBar(
+          title: Text('Meet In The Middle',style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+          )),
+          backgroundColor: Color.fromRGBO(163, 217, 229, 1),
+          elevation: 0.0,
+          actions: <Widget>[
+            FlatButton.icon(
+              textColor: Colors.white,
+              icon: Icon(Icons.person),
+              label: Text('Logout'),
+              onPressed: () async {
+                await _auth.signOut();
+              },
+            ),
+          ],
+        ),
+        drawer: Drawer(
+            child: ListView(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(163, 217, 229, 1),
               ),
-              drawer: Drawer(
-                  child: ListView(
-                    children: [
-                      DrawerHeader(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[850],
-                        ),
-                        child: Text(
-                          'Meet In The Middle',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        title: Text('Update Profile'),
-                        leading: Icon(Icons.settings),
-                        onTap: () {
-                          _showSettingsPanel();
-                        },
-                      ),
-                      ListTile(
-                        title: Text('Update Location'),
-                        leading: Icon(Icons.location_on),
-                        onTap: () {},
-                      ),
-                    ],
-                  )),
-              body: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  UserList(),
-                ],
+              child: Text(
+                'Meet In The Middle',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
               ),
             ),
-          );
-        }
-
-
+            ListTile(
+              title: Text('Update Profile'),
+              leading: Icon(Icons.settings),
+              onTap: () {
+                _showSettingsPanel();
+              },
+            ),
+            ListTile(
+              title: Text('Update Location'),
+              leading: Icon(Icons.location_on),
+              onTap: () {},
+            ),
+          ],
+        )),
+        body: Column(
+          children: <Widget>[
+            CategorySelector(),
+            Expanded(
+              child: Container(
+                  decoration: BoxDecoration(
+                      color: Color.fromRGBO(242, 243, 245, 1),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30))),
+                  child : UserList()),
+            ),
+            ],
+        ),
+      ),
+    );
   }
+}
