@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 
@@ -26,9 +27,8 @@ class DataBaseService {
     });
   }
 
-
   //UserData from snapshot
-  UserData _userDataFromSnapShot(DocumentSnapshot snapshot) {
+  UserData userDataFromSnapShot(DocumentSnapshot snapshot) {
     return UserData(
       uid: snapshot.data['uId'] ?? '',
       name: snapshot.data['name'] ?? '',
@@ -41,7 +41,7 @@ class DataBaseService {
     );
   }
 
-  List<UserData> _familyListFromSnapshot(QuerySnapshot snapshot) {
+  List<UserData> familyListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
       return UserData(
           uid: doc.data['uId'] ?? '',
@@ -54,16 +54,14 @@ class DataBaseService {
       );
     }).toList();
   }
-
   //get user stream
   Stream<List<UserData>> get users {
     return userCollection.snapshots()
-        .map(_familyListFromSnapshot);
+        .map(familyListFromSnapshot);
   }
-
   //get user doc stream
   Stream<UserData> get userData {
     return userCollection.document(uid).snapshots()
-        .map(_userDataFromSnapShot);
+        .map(userDataFromSnapShot);
   }
 }
