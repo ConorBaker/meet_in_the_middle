@@ -7,7 +7,6 @@ import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:meet_in_the_middle/shared/constants.dart';
 import 'package:meet_in_the_middle/shared/loading.dart';
-import 'package:meet_in_the_middle/shared/picture_selector.dart';
 import 'package:provider/provider.dart';
 
 

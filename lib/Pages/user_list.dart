@@ -106,7 +106,7 @@ class _UserListState extends State<UserList> {
           itemCount: users.length,
           itemBuilder: (context, index) {
             if (users[index].uid != userid) {
-              return UserTile(user: users[index]);
+                  return UserTile(user: users[index]);
             } else {
               return Container();
             }

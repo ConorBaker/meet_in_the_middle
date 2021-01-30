@@ -40,6 +40,36 @@ class Home_State extends State<Home> {
       );
     }
 
+    void _createFamily() {
+      Navigator.pop(context);
+      showModalBottomSheet(
+          context: context,
+          builder: (BuildContext bc){
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Container(
+                child : SettingsForm(),
+              ),
+            );
+          }
+      );
+    }
+
+    void _joinFamily() {
+      Navigator.pop(context);
+      showModalBottomSheet(
+          context: context,
+          builder: (BuildContext bc){
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Container(
+                child : SettingsForm(),
+              ),
+            );
+          }
+      );
+    }
+
     return StreamBuilder<UserData>(
         stream: DataBaseService(uid: user.uid).userData,
     builder: (context, snapshot) {
@@ -102,12 +132,16 @@ class Home_State extends State<Home> {
                     ListTile(
                       title: Text('Create a Family'),
                       leading: Icon(Icons.add),
-                      onTap: () {},
+                      onTap: () {
+                        _createFamily();
+                      },
                     ),
                     ListTile(
                       title: Text('Join a Family'),
                       leading: Icon(Icons.workspaces_filled),
-                      onTap: () {},
+                      onTap: () {
+                        _joinFamily();
+                      },
                     ),
                   ],
                 )),
