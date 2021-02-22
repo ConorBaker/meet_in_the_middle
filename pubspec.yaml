@@ -32,11 +32,16 @@ dependencies:
   cloud_firestore: ^0.12.9+4
   firebase_core: ^0.4.0
   firebase_messaging: ^5.0.2
+  flutter_local_notifications: ^1.4.4+1
   location: ^2.3.5
   provider: ^3.1.0
   google_maps_flutter: ^0.5.21+15
+  workmanager: ^0.2.0
+  geolocator: ^5.3.2+2
   dependencies:
   flutter_spinkit: "^4.0.0"
+
+
 
 
 

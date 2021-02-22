@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:location/location.dart';
 import 'package:meet_in_the_middle/Pages/users.tile.dart';
-import 'package:meet_in_the_middle/models/user.dart';
+
 import 'package:meet_in_the_middle/models/users.dart';
-import 'package:meet_in_the_middle/services/auth.dart';
+
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -17,10 +18,14 @@ class UserList extends StatefulWidget {
 
 class _UserListState extends State<UserList> {
   FirebaseAuth _auth;
-  FirebaseUser user;
   String userid;
 
+
   check(BuildContext context, List users) async {
+    Location location = new Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
     _auth = FirebaseAuth.instance;
     final FirebaseUser user = await _auth.currentUser();
     userid = user.uid;
@@ -57,12 +62,15 @@ class _UserListState extends State<UserList> {
                         onPressed: () async {
                           for (var user2 in users) {
                             if (user2.uid == spl[1]) {
+                              _serviceEnabled =
+                              await location.serviceEnabled();
+                              _locationData = await location.getLocation();
                               await DataBaseService(uid: user2.uid)
                                   .updateUserData(
-                                  user2.uid, user2.name, user2.lat, user2.lng,
+                                  user2.uid, user2.name, _locationData.latitude, _locationData.longitude,
                                   user2.token,
                                   "sent_" + user.lat.toString() + "_" +
-                                      user.lng.toString(),user.profileImage);
+                                      user.lng.toString(),user2.profileImage);
                               Navigator.of(context).pop();
                             }
                           }
@@ -95,19 +103,27 @@ class _UserListState extends State<UserList> {
     );
   }
 
+  int count = 0;
+
   @override
   Widget build(BuildContext context) {
     final users = Provider.of<List<UserData>>(context) ?? [];
     check(context, users);
+    UserData user;
+    for (var u in users) {
+      if(userid == u.uid){
+        user = u;
+      }
+    }
     return
       ListView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
           itemCount: users.length,
           itemBuilder: (context, index) {
-            if (users[index].uid != userid) {
+            if (users[index].uid != userid && users[index].token == user.token && users[index].token != "" ) {
                   return UserTile(user: users[index]);
-            } else {
+            }else{
               return Container();
             }
           }
