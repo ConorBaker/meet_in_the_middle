@@ -6,8 +6,9 @@ class UserData{
   final String token;
   final String message;
   final String profileImage;
+  final int count;
 
-  UserData({this.uid, this.name, this.lat, this.lng, this.token,this.message,this.profileImage});
+  UserData({this.uid, this.name, this.lat, this.lng, this.token,this.message,this.profileImage,this.count});
 
 
 

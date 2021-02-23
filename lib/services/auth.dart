@@ -33,7 +33,7 @@ class AuthService {
       AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = result.user;
 
-      await DataBaseService(uid: user.uid).updateUserData(user.uid.toString(),'New Family Member',0,0,"","","assets/Man1.png");
+      await DataBaseService(uid: user.uid).updateUserData(user.uid.toString(),'New Family Member',0,0,"","","assets/Man1.png",0);
 
       return _userFromFireBaseUser(user);
     }catch(e){

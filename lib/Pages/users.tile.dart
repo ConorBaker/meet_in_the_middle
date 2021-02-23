@@ -61,7 +61,8 @@ class UserTile extends StatelessWidget {
                                     user.lat,
                                     user.lng,
                                     user.token,
-                                    "request_" + userid,user.profileImage);
+                                    "request_" + userid,user.profileImage,
+                                0);
                               },
                             ),
                           ],

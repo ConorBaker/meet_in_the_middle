@@ -24,20 +24,42 @@ class Home extends StatefulWidget {
   Home_State createState() => Home_State();
 }
 
-
-Future execute(var inputData) async{
+Future execute(var inputData) async {
+  Position userLocation = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
   var _list = inputData.values.toList();
   DocumentSnapshot variable = await Firestore.instance.collection('users').document(_list[0]).get();
-  Position userLocation = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
-  await DataBaseService(uid: _list[0]).updateUserData(
-      variable.data['uId'],
-      variable.data['name'],
-      userLocation.latitude,
-      userLocation.longitude,
-      variable.data['token'],
-      "",
-      variable.data['profileImage']);
-}
+  String lat2 = variable.data['lat'].toStringAsFixed(4);
+  String lng2 = variable.data['lng'].toStringAsFixed(4);
+  String lat1 = userLocation.latitude.toStringAsFixed(4);
+  String lng1 = userLocation.longitude.toStringAsFixed(4);
+
+
+  if (lat1 == lat2 && lng1 == lng2) {
+    int x = variable.data['count'];
+    if( x < 4){
+      x = x +1;
+      await DataBaseService(uid: _list[0]).updateUserData(
+          variable.data['uId'],
+          variable.data['name'],
+          userLocation.latitude,
+          userLocation.longitude,
+          variable.data['token'],
+          "",
+          variable.data['profileImage'],
+          x);
+    }
+  }else{
+    await DataBaseService(uid: _list[0]).updateUserData(
+        variable.data['uId'],
+        variable.data['name'],
+        userLocation.latitude,
+        userLocation.longitude,
+        variable.data['token'],
+        "",
+        variable.data['profileImage'],
+        0);
+  }
+  }
 
 
 const fetchBackground = "fetchBackground";
@@ -57,14 +79,13 @@ void callbackDispatcher() async {
 class Home_State extends State<Home> {
   final AuthService _auth = AuthService();
   final Firestore db = Firestore.instance;
-
-  void main(String uid){
-    Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  void main(String uid) {
+    Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
     Workmanager.initialize(callbackDispatcher, isInDebugMode: true);
     Workmanager.registerPeriodicTask("1", fetchBackground,
-        frequency: Duration(minutes: 15),
+        frequency: Duration(minutes: 20),
         inputData: {'string': uid},
-        initialDelay: Duration(seconds: 1));
+        initialDelay: Duration(seconds: 10));
   }
 
   @override

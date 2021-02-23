@@ -34,7 +34,7 @@ class _UserListState extends State<UserList> {
       var spl = compare.split("_");
       if (spl[0] == "request" && userid == user.uid) {
         await DataBaseService(uid: user.uid).updateUserData(
-            user.uid, user.name, user.lat, user.lng, user.token, "",user.profileImage);
+            user.uid, user.name, user.lat, user.lng, user.token, "",user.profileImage,0);
         showGeneralDialog(
             barrierColor: Colors.black.withOpacity(0.5),
             transitionBuilder: (context, a1, a2, widget) {
@@ -70,7 +70,7 @@ class _UserListState extends State<UserList> {
                                   user2.uid, user2.name, _locationData.latitude, _locationData.longitude,
                                   user2.token,
                                   "sent_" + user.lat.toString() + "_" +
-                                      user.lng.toString(),user2.profileImage);
+                                      user.lng.toString(),user2.profileImage,0);
                               Navigator.of(context).pop();
                             }
                           }
@@ -88,7 +88,7 @@ class _UserListState extends State<UserList> {
             pageBuilder: (context, animation1, animation2) {});
       } else if (spl[0] == "sent" && user.uid == userid) {
         await DataBaseService(uid: user.uid).updateUserData(
-            user.uid, user.name, user.lat, user.lng, user.token, "",user.profileImage);
+            user.uid, user.name, user.lat, user.lng, user.token, "",user.profileImage,0);
         OpenMap(spl[1], spl[2]);
       }
     }

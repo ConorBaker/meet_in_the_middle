@@ -15,7 +15,7 @@ class DataBaseService {
       'users');
 
   Future updateUserData(String uId, String name, double lat, double lng,
-      String token,String message,String profileImage) async {
+      String token,String message,String profileImage,int count) async {
     return await userCollection.document(uid).setData({
       'uId': uId ?? '',
       'name': name ?? '',
@@ -23,7 +23,8 @@ class DataBaseService {
       'lng': lng ?? '',
       'token': token ?? '',
       'message' : message ?? '',
-      'profileImage' : profileImage ?? ''
+      'profileImage' : profileImage ?? '',
+      'count' : count ?? 0,
     });
   }
 
@@ -37,6 +38,7 @@ class DataBaseService {
       token: snapshot.data['token'] ?? '',
       message: snapshot.data['message'] ?? '',
       profileImage: snapshot.data['profileImage'] ?? '',
+      count : snapshot.data['count'] ?? 0,
 
     );
   }
@@ -50,7 +52,8 @@ class DataBaseService {
           lng: doc.data['lng'] ?? '',
           token: doc.data['token'] ?? '',
           message: doc.data['message'] ?? '',
-          profileImage: doc.data['profileImage'] ?? ''
+          profileImage: doc.data['profileImage'] ?? '',
+          count : doc.data['count'] ?? 0
       );
     }).toList();
   }
