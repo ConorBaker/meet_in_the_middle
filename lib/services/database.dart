@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:meet_in_the_middle/models/place.dart';
 import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 
@@ -13,6 +14,8 @@ class DataBaseService {
 
   final CollectionReference userCollection = Firestore.instance.collection(
       'users');
+  final CollectionReference locationCollections = Firestore.instance.collection(
+      'places');
 
   Future updateUserData(String uId, String name, double lat, double lng,
       String token,String message,String profileImage,int count) async {
@@ -25,6 +28,17 @@ class DataBaseService {
       'message' : message ?? '',
       'profileImage' : profileImage ?? '',
       'count' : count ?? 0,
+    });
+  }
+
+
+  Future updatePlaceData(String name, double lat, double lng,
+      String day) async {
+    return await locationCollections.document(uid).setData({
+      'name': name ?? '',
+      'lat': lat ?? '',
+      'lng': lng ?? '',
+      'day' : day ?? ''
     });
   }
 
@@ -44,16 +58,29 @@ class DataBaseService {
   }
 
   List<UserData> familyListFromSnapshot(QuerySnapshot snapshot) {
+      return snapshot.documents.map((doc) {
+        return UserData(
+            uid: doc.data['uId'] ?? '',
+            name: doc.data['name'] ?? '',
+            lat: doc.data['lat'] ?? '',
+            lng: doc.data['lng'] ?? '',
+            token: doc.data['token'] ?? '',
+            message: doc.data['message'] ?? '',
+            profileImage: doc.data['profileImage'] ?? '',
+            count : doc.data['count'] ?? 0
+        );
+      }).toList();
+  }
+
+
+  List<Place> LocationListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
-      return UserData(
-          uid: doc.data['uId'] ?? '',
-          name: doc.data['name'] ?? '',
-          lat: doc.data['lat'] ?? '',
-          lng: doc.data['lng'] ?? '',
-          token: doc.data['token'] ?? '',
-          message: doc.data['message'] ?? '',
-          profileImage: doc.data['profileImage'] ?? '',
-          count : doc.data['count'] ?? 0
+      return Place(
+        name: doc.data['name'] ?? '',
+        lat: doc.data['lat'] ?? '',
+        lng: doc.data['lng'] ?? '',
+        day: doc.data['day'] ?? '',
+
       );
     }).toList();
   }
@@ -61,6 +88,12 @@ class DataBaseService {
   Stream<List<UserData>> get users {
     return userCollection.snapshots()
         .map(familyListFromSnapshot);
+  }
+
+  //get location stream
+  Stream<List<Place>> get places {
+    return userCollection.snapshots()
+        .map(LocationListFromSnapshot);
   }
   //get user doc stream
   Stream<UserData> get userData {

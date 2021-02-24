@@ -10,6 +10,4 @@ class UserData{
 
   UserData({this.uid, this.name, this.lat, this.lng, this.token,this.message,this.profileImage,this.count});
 
-
-
 }
