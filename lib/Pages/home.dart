@@ -34,18 +34,28 @@ Future execute(var inputData) async {
   String lng2 = variable.data['lng'].toStringAsFixed(4);
   String lat1 = userLocation.latitude.toStringAsFixed(4);
   String lng1 = userLocation.longitude.toStringAsFixed(4);
+  List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(userLocation.latitude, userLocation.longitude);
 
-  if (lat1 == lat2 && lng1 == lng2) {
+  var placesCheck = await Firestore.instance.collection('places').getDocuments();
+  int l = placesCheck.documents.length +1;
+  bool found = false;
+  for(int i = 1; i < l; i++){
+    DocumentSnapshot variable2 = await Firestore.instance.collection('places').document(i.toString()).get();
+    String name = variable2.data['name'];
+    if (name == placemark[0].name + " " + placemark[0].thoroughfare + " " + placemark[0].administrativeArea) {
+      found = true;
+    }
+  }
+
+  if (lat1 == lat2 && lng1 == lng2 && found == false) {
     int x = variable.data['count'];
-    if (x == 3) {
+    if (x == 2) {
       x = x + 1;
-      var allUsers =
-          await Firestore.instance.collection('places').getDocuments();
-      String newID = (allUsers.documents.length + 1).toString();
+      var places = await Firestore.instance.collection('places').getDocuments();
+      String newID = (places.documents.length + 1).toString();
       DateTime now = new DateTime.now();
       await DataBaseService(uid: newID).updatePlaceData(
-          "", userLocation.latitude, userLocation.longitude, now.toString());
-
+          placemark[0].name + " " + placemark[0].thoroughfare + " " + placemark[0].administrativeArea, userLocation.latitude, userLocation.longitude, now.toString());
       await DataBaseService(uid: _list[0]).updateUserData(
           variable.data['uId'],
           variable.data['name'],
@@ -55,9 +65,8 @@ Future execute(var inputData) async {
           "",
           variable.data['profileImage'],
           x);
-
-    } else if (x > 3) {
-    } else if (x < 3) {
+    } else if (x > 2) {
+    } else if (x < 2) {
       x = x + 1;
       await DataBaseService(uid: _list[0]).updateUserData(
           variable.data['uId'],
@@ -78,7 +87,7 @@ Future execute(var inputData) async {
         variable.data['token'],
         "",
         variable.data['profileImage'],
-        0);
+        3);
   }
 }
 
@@ -102,7 +111,7 @@ class Home_State extends State<Home> {
 
   void main(String uid) {
     Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
-    Workmanager.initialize(callbackDispatcher, isInDebugMode: true);
+    Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
     Workmanager.registerPeriodicTask("1", fetchBackground,
         frequency: Duration(minutes: 15),
         inputData: {'string': uid},

@@ -22,8 +22,8 @@ class LocalNotification {
 
   static ShowOneTimeNotification(DateTime scheduledDate) async {
     var notificationDetails = NotificationDetails(androidSettings, null);
-    await flutterNotificationPlugin.schedule(1, "Background Task notification",
-        "Data saved to database", scheduledDate, notificationDetails,
+    await flutterNotificationPlugin.schedule(1, "Your location has been requested your location",
+        "Click here to accept or deny", scheduledDate, notificationDetails,
         androidAllowWhileIdle: true);
   }
 }
