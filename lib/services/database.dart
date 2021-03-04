@@ -4,41 +4,38 @@ import 'package:meet_in_the_middle/models/place.dart';
 import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 
-
-
 class DataBaseService {
-
   final String uid;
 
   DataBaseService({this.uid});
 
-  final CollectionReference userCollection = Firestore.instance.collection(
-      'users');
-  final CollectionReference locationCollections = Firestore.instance.collection(
-      'places');
+  final CollectionReference userCollection =
+  Firestore.instance.collection('users');
+  final CollectionReference locationCollections =
+  Firestore.instance.collection('places');
 
   Future updateUserData(String uId, String name, double lat, double lng,
-      String token,String message,String profileImage,int count) async {
+      String token, String message, String profileImage, int count) async {
     return await userCollection.document(uid).setData({
       'uId': uId ?? '',
       'name': name ?? '',
       'lat': lat ?? '',
       'lng': lng ?? '',
       'token': token ?? '',
-      'message' : message ?? '',
-      'profileImage' : profileImage ?? '',
-      'count' : count ?? 0,
+      'message': message ?? '',
+      'profileImage': profileImage ?? '',
+      'count': count ?? 0,
     });
   }
 
-
   Future updatePlaceData(String name, double lat, double lng,
-      String day) async {
+      String day, String picture) async {
     return await locationCollections.document(uid).setData({
       'name': name ?? '',
       'lat': lat ?? '',
       'lng': lng ?? '',
-      'day' : day ?? ''
+      'day': day ?? '',
+      'picture': picture ?? ''
     });
   }
 
@@ -52,26 +49,23 @@ class DataBaseService {
       token: snapshot.data['token'] ?? '',
       message: snapshot.data['message'] ?? '',
       profileImage: snapshot.data['profileImage'] ?? '',
-      count : snapshot.data['count'] ?? 0,
-
+      count: snapshot.data['count'] ?? 0,
     );
   }
 
   List<UserData> familyListFromSnapshot(QuerySnapshot snapshot) {
-      return snapshot.documents.map((doc) {
-        return UserData(
-            uid: doc.data['uId'] ?? '',
-            name: doc.data['name'] ?? '',
-            lat: doc.data['lat'] ?? '',
-            lng: doc.data['lng'] ?? '',
-            token: doc.data['token'] ?? '',
-            message: doc.data['message'] ?? '',
-            profileImage: doc.data['profileImage'] ?? '',
-            count : doc.data['count'] ?? 0
-        );
-      }).toList();
+    return snapshot.documents.map((doc) {
+      return UserData(
+          uid: doc.data['uId'] ?? '',
+          name: doc.data['name'] ?? '',
+          lat: doc.data['lat'] ?? '',
+          lng: doc.data['lng'] ?? '',
+          token: doc.data['token'] ?? '',
+          message: doc.data['message'] ?? '',
+          profileImage: doc.data['profileImage'] ?? '',
+          count: doc.data['count'] ?? 0);
+    }).toList();
   }
-
 
   List<Place> LocationListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
@@ -80,24 +74,23 @@ class DataBaseService {
         lat: doc.data['lat'] ?? '',
         lng: doc.data['lng'] ?? '',
         day: doc.data['day'] ?? '',
-
+        picture: doc.data['picture'] ?? '',
       );
     }).toList();
   }
+
   //get user stream
   Stream<List<UserData>> get users {
-    return userCollection.snapshots()
-        .map(familyListFromSnapshot);
+    return userCollection.snapshots().map(familyListFromSnapshot);
   }
 
   //get location stream
   Stream<List<Place>> get places {
-    return userCollection.snapshots()
-        .map(LocationListFromSnapshot);
+    return locationCollections.snapshots().map(LocationListFromSnapshot);
   }
+
   //get user doc stream
   Stream<UserData> get userData {
-    return userCollection.document(uid).snapshots()
-        .map(userDataFromSnapShot);
+    return userCollection.document(uid).snapshots().map(userDataFromSnapShot);
   }
 }

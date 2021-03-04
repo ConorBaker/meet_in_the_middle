@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:meet_in_the_middle/Pages/home.dart';
+import 'package:meet_in_the_middle/Pages/view_safe_places.dart';
 
 class CategorySelector extends StatefulWidget {
+  final int selectedIndex;
+
+  CategorySelector(this.selectedIndex);
+
   @override
   _CategorySelectorState createState() => _CategorySelectorState();
 }
 
 class _CategorySelectorState extends State<CategorySelector> {
-  int selectedIndex = 0;
-  final List<String> categories = ['Users','Requests', 'Places',];
+  final List<String> categories = ['Users','Places', 'Requests','Online'];
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = widget.selectedIndex;
     return Container(
       height: 90,
       color : Color.fromRGBO(163,217,229,1),
@@ -22,6 +28,25 @@ class _CategorySelectorState extends State<CategorySelector> {
                 setState(() {
                   selectedIndex = index;
                 });
+                if(index == 0){
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Home()),
+                  );
+                  return Home();
+                }else if(index == 1){
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => safe_places()),
+                  );
+                  return safe_places();
+                }else if(index == 2){
+
+                }else if(index == 3){
+
+                }
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(

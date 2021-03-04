@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:meet_in_the_middle/Pages/settings_form.dart';
@@ -10,14 +8,13 @@ import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/auth.dart';
 import 'package:meet_in_the_middle/services/database.dart';
-import 'package:meet_in_the_middle/services/local_notification.dart';
+import 'package:meet_in_the_middle/shared/approve_locations.dart';
 import 'package:meet_in_the_middle/shared/category_selector.dart';
 import 'package:meet_in_the_middle/shared/currernt_login.dart';
 import 'package:meet_in_the_middle/shared/family_maker.dart';
 import 'package:meet_in_the_middle/shared/join_family.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:background_location/background_location.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -30,22 +27,59 @@ Future execute(var inputData) async {
   var _list = inputData.values.toList();
   DocumentSnapshot variable =
       await Firestore.instance.collection('users').document(_list[0]).get();
-  String lat2 = variable.data['lat'].toStringAsFixed(4);
-  String lng2 = variable.data['lng'].toStringAsFixed(4);
-  String lat1 = userLocation.latitude.toStringAsFixed(4);
-  String lng1 = userLocation.longitude.toStringAsFixed(4);
-  List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(userLocation.latitude, userLocation.longitude);
+  String lat2 = variable.data['lat'].toStringAsFixed(3);
+  String lng2 = variable.data['lng'].toStringAsFixed(3);
+  String lat1 = userLocation.latitude.toStringAsFixed(3);
+  String lng1 = userLocation.longitude.toStringAsFixed(3);
+  List<Placemark> placemark = await Geolocator()
+      .placemarkFromCoordinates(userLocation.latitude, userLocation.longitude);
 
-  var placesCheck = await Firestore.instance.collection('places').getDocuments();
-  int l = placesCheck.documents.length +1;
+  var placesCheck =
+      await Firestore.instance.collection('places').getDocuments();
+  int l = placesCheck.documents.length + 1;
   bool found = false;
-  for(int i = 1; i < l; i++){
-    DocumentSnapshot variable2 = await Firestore.instance.collection('places').document(i.toString()).get();
+  for (int i = 1; i < l; i++) {
+    DocumentSnapshot variable2 = await Firestore.instance
+        .collection('places')
+        .document(i.toString())
+        .get();
     String name = variable2.data['name'];
-    if (name == placemark[0].name + " " + placemark[0].thoroughfare + " " + placemark[0].administrativeArea) {
+    if (name ==
+            placemark[0].name +
+                " " +
+                placemark[0].thoroughfare +
+                " " +
+                placemark[0].administrativeArea ||
+        lat1 == variable2.data['lat'].toStringAsFixed(3) &&
+            lng1 == variable2.data['lng'].toStringAsFixed(3)) {
       found = true;
     }
   }
+
+  var amount = await Firestore.instance
+      .collection('users')
+      .document(_list[0])
+      .collection("locations")
+      .getDocuments();
+  int x = amount.documents.length + 1;
+
+  await Firestore.instance
+      .collection('users')
+      .document(_list[0])
+      .collection("locations")
+      .add({
+    x.toString(): placemark[0].name +
+        "_" +
+        placemark[0].thoroughfare +
+        "_" +
+        placemark[0].administrativeArea +
+        "/" +
+        userLocation.latitude.toString() +
+        "/" +
+        userLocation.longitude.toString() +
+        "-" +
+        DateTime.now().toString()
+  });
 
   if (lat1 == lat2 && lng1 == lng2 && found == false) {
     int x = variable.data['count'];
@@ -55,7 +89,15 @@ Future execute(var inputData) async {
       String newID = (places.documents.length + 1).toString();
       DateTime now = new DateTime.now();
       await DataBaseService(uid: newID).updatePlaceData(
-          placemark[0].name + " " + placemark[0].thoroughfare + " " + placemark[0].administrativeArea, userLocation.latitude, userLocation.longitude, now.toString());
+          placemark[0].name +
+              " " +
+              placemark[0].thoroughfare +
+              " " +
+              placemark[0].administrativeArea,
+          userLocation.latitude,
+          userLocation.longitude,
+          now.toString(),
+          " ");
       await DataBaseService(uid: _list[0]).updateUserData(
           variable.data['uId'],
           variable.data['name'],
@@ -78,7 +120,7 @@ Future execute(var inputData) async {
           variable.data['profileImage'],
           x);
     }
-  } else {
+  } else if (found == true) {
     await DataBaseService(uid: _list[0]).updateUserData(
         variable.data['uId'],
         variable.data['name'],
@@ -88,6 +130,16 @@ Future execute(var inputData) async {
         "",
         variable.data['profileImage'],
         3);
+  } else {
+    await DataBaseService(uid: _list[0]).updateUserData(
+        variable.data['uId'],
+        variable.data['name'],
+        userLocation.latitude,
+        userLocation.longitude,
+        variable.data['token'],
+        "",
+        variable.data['profileImage'],
+        0);
   }
 }
 
@@ -110,12 +162,12 @@ class Home_State extends State<Home> {
   final Firestore db = Firestore.instance;
 
   void main(String uid) {
-    Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+    Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Geolocator().checkGeolocationPermissionStatus();
     Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
     Workmanager.registerPeriodicTask("1", fetchBackground,
-        frequency: Duration(minutes: 15),
         inputData: {'string': uid},
-        initialDelay: Duration(seconds: 15));
+        initialDelay: Duration(seconds: 5));
   }
 
   @override
@@ -160,6 +212,28 @@ class Home_State extends State<Home> {
               ),
             );
           });
+    }
+
+    Future<void> _approveLocations() async {
+      Navigator.pop(context);
+      var placesCheck =
+          await Firestore.instance.collection('places').getDocuments();
+      int l = placesCheck.documents.length + 1;
+      for (int i = 1; i < l; i++) {
+        DocumentSnapshot variable = await Firestore.instance.collection('places').document(i.toString()).get();
+        if (variable.data['picture'] == " ") {
+          showModalBottomSheet(
+              context: context,
+              builder: (BuildContext bc) {
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Container(
+                    child: approval(id: i.toString(),address : variable.data['name']),
+                  ),
+                );
+              });
+        }
+      }
     }
 
     return StreamProvider<List<UserData>>.value(
@@ -218,11 +292,34 @@ class Home_State extends State<Home> {
                 _joinFamily();
               },
             ),
+            ListTile(
+              title: Text('Approve Safe Locations'),
+              leading: Icon(Icons.approval),
+              onTap: () {
+                _approveLocations();
+              },
+            ),
+            ListTile(
+              title: Text('Reset Background Location'),
+              leading: Icon(Icons.reset_tv),
+              onTap: () {
+                /*
+                final user = Provider.of<User>(context);
+                Workmanager.cancelByTag("1");
+                Workmanager.initialize(callbackDispatcher,
+                    isInDebugMode: false);
+                Workmanager.registerPeriodicTask("1", fetchBackground,
+                    //frequency: Duration(minutes: 16),
+                    inputData: {'string': user.uid},
+                    initialDelay: Duration(seconds: 5));
+                 */
+              },
+            )
           ],
         )),
         body: Column(
           children: <Widget>[
-            CategorySelector(),
+            CategorySelector(0),
             Expanded(
               child: Container(
                   decoration: BoxDecoration(
