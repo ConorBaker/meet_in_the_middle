@@ -61,14 +61,21 @@ Future execute(var inputData) async {
       .document(_list[0])
       .collection("locations")
       .getDocuments();
-  int x = amount.documents.length + 1;
+
+  int placeAmount = amount.documents.length + 1;
+  int lastWeek = 0;
+  //last 5 days
+  if (placeAmount > 479) {
+    lastWeek = (placeAmount - 479);
+  }
 
   await Firestore.instance
       .collection('users')
       .document(_list[0])
       .collection("locations")
-      .add({
-    x.toString(): placemark[0].name +
+      .document(placeAmount.toString())
+      .setData({
+      "data": placemark[0].name +
         "_" +
         placemark[0].thoroughfare +
         "_" +
@@ -77,27 +84,58 @@ Future execute(var inputData) async {
         userLocation.latitude.toString() +
         "/" +
         userLocation.longitude.toString() +
-        "-" +
+        "/" +
         DateTime.now().toString()
   });
+
+  bool found2 = false;
+  for (lastWeek; lastWeek < placeAmount - 1; lastWeek++) {
+    var l = await Firestore.instance
+        .collection('users')
+        .document(_list[0])
+        .collection("locations")
+        .document(lastWeek.toString())
+        .get();
+
+    String dateCheck1 = l.data['data'];
+    var dateCheck2 = dateCheck1.split("/");
+    var dateCheck = dateCheck2[dateCheck2.length].split(" ");
+    String lat1 = userLocation.latitude.toStringAsFixed(3);
+    String lng1 = userLocation.longitude.toStringAsFixed(3);
+    String lat2 = double.parse(dateCheck2[dateCheck2.length-2]).toStringAsFixed(3);
+    String lng2 = double.parse(dateCheck2[dateCheck2.length-1]).toStringAsFixed(3);
+
+    String todayDate = DateTime.now().toString();
+    var tdCheck = todayDate.split(" ");
+
+    if(dateCheck[0] != tdCheck[0]){
+      if(lat1 == lat2 && lng1 == lng2){
+        found2 = true;
+      }
+    }
+
+  }
 
   if (lat1 == lat2 && lng1 == lng2 && found == false) {
     int x = variable.data['count'];
     if (x == 2) {
       x = x + 1;
-      var places = await Firestore.instance.collection('places').getDocuments();
-      String newID = (places.documents.length + 1).toString();
-      DateTime now = new DateTime.now();
-      await DataBaseService(uid: newID).updatePlaceData(
-          placemark[0].name +
-              " " +
-              placemark[0].thoroughfare +
-              " " +
-              placemark[0].administrativeArea,
-          userLocation.latitude,
-          userLocation.longitude,
-          now.toString(),
-          " ");
+      if(found2) {
+        var places = await Firestore.instance.collection('places')
+            .getDocuments();
+        String newID = (places.documents.length + 1).toString();
+        DateTime now = new DateTime.now();
+        await DataBaseService(uid: newID).updatePlaceData(
+            placemark[0].name +
+                " " +
+                placemark[0].thoroughfare +
+                " " +
+                placemark[0].administrativeArea,
+            userLocation.latitude,
+            userLocation.longitude,
+            now.toString(),
+            " ");
+      }
       await DataBaseService(uid: _list[0]).updateUserData(
           variable.data['uId'],
           variable.data['name'],
@@ -166,8 +204,7 @@ class Home_State extends State<Home> {
     Geolocator().checkGeolocationPermissionStatus();
     Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
     Workmanager.registerPeriodicTask("1", fetchBackground,
-        inputData: {'string': uid},
-        initialDelay: Duration(seconds: 5));
+        inputData: {'string': uid}, initialDelay: Duration(seconds: 5));
   }
 
   @override
@@ -220,7 +257,10 @@ class Home_State extends State<Home> {
           await Firestore.instance.collection('places').getDocuments();
       int l = placesCheck.documents.length + 1;
       for (int i = 1; i < l; i++) {
-        DocumentSnapshot variable = await Firestore.instance.collection('places').document(i.toString()).get();
+        DocumentSnapshot variable = await Firestore.instance
+            .collection('places')
+            .document(i.toString())
+            .get();
         if (variable.data['picture'] == " ") {
           showModalBottomSheet(
               context: context,
@@ -228,7 +268,8 @@ class Home_State extends State<Home> {
                 return Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Container(
-                    child: approval(id: i.toString(),address : variable.data['name']),
+                    child: approval(
+                        id: i.toString(), address: variable.data['name']),
                   ),
                 );
               });
