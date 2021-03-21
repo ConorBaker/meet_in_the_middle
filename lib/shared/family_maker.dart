@@ -14,7 +14,7 @@ class CreateFamily extends StatefulWidget {
 class _CreateFamilyState extends State<CreateFamily> {
     final _formKey = GlobalKey<FormState>();
     final _chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
     Random _rnd = Random();
     String getRandomString(int length) =>
         String.fromCharCodes(Iterable.generate(
@@ -65,7 +65,7 @@ class _CreateFamilyState extends State<CreateFamily> {
                             "",
                             userData.profileImage,
                             0,
-                            userData.parent
+                            true
                         );
                         Navigator.pop(context);
                       },

@@ -23,6 +23,7 @@ class _approvalState extends State<approval> {
   }
 
   int selectedIndex = 0;
+  String _currentName;
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +40,14 @@ class _approvalState extends State<approval> {
                 )),
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Text(widget.address,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                  )),
+              child: TextFormField(
+                initialValue: widget.address,
+                validator: (val) =>
+                val.isEmpty
+                    ? 'Please Enter a Name'
+                    : null,
+                onChanged: (val) => setState(() => _currentName = val),
+              ),
             )
           ],
         ),
@@ -86,7 +91,7 @@ class _approvalState extends State<approval> {
                   DocumentSnapshot variable = await Firestore.instance.collection('places').document(widget.id.toString()).get();
                   await DataBaseService(uid: widget.id)
                       .updatePlaceData(
-                      variable.data['name'],
+                      _currentName ?? variable.data['name'],
                       variable.data['lat'],
                       variable.data['lng'],
                       variable.data['day'],
