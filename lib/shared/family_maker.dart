@@ -63,7 +63,9 @@ class _CreateFamilyState extends State<CreateFamily> {
                             userData.lng,
                             code,
                             "",
-                            userData.profileImage,0
+                            userData.profileImage,
+                            0,
+                            userData.parent
                         );
                         Navigator.pop(context);
                       },

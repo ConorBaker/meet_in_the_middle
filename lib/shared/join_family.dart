@@ -57,7 +57,9 @@ class _JoinFamilyState extends State<JoinFamily> {
                                     userData.lng,
                                     code,
                                     "",
-                                    userData.profileImage,0
+                                    userData.profileImage,
+                                    0,
+                                    userData.parent
                                 );
                                 Navigator.pop(context);
                               }

@@ -80,7 +80,9 @@ class _SettingsFormState extends State<SettingsForm> {
                                           userData.lng,
                                           userData.token,
                                           "",
-                                          pictures[index],0
+                                          pictures[index],
+                                          0,
+                                        userData.parent
                                       );
                                       setState(() {
                                         selection = index;
@@ -117,7 +119,9 @@ class _SettingsFormState extends State<SettingsForm> {
                                     _locationData.longitude,
                                     userData.token,
                                     "",
-                                    userData.profileImage,0
+                                    userData.profileImage,
+                                    0,
+                                  userData.parent
                                 );
                                 Navigator.pop(context);
                               }

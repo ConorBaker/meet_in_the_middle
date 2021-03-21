@@ -15,6 +15,8 @@ import 'package:meet_in_the_middle/shared/family_maker.dart';
 import 'package:meet_in_the_middle/shared/join_family.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:flushbar/flushbar.dart';
+import 'package:flushbar/flushbar_helper.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -75,7 +77,7 @@ Future execute(var inputData) async {
       .collection("locations")
       .document(placeAmount.toString())
       .setData({
-      "data": placemark[0].name +
+    "data": placemark[0].name +
         "_" +
         placemark[0].thoroughfare +
         "_" +
@@ -102,27 +104,28 @@ Future execute(var inputData) async {
     var dateCheck = dateCheck2[dateCheck2.length].split(" ");
     String lat1 = userLocation.latitude.toStringAsFixed(3);
     String lng1 = userLocation.longitude.toStringAsFixed(3);
-    String lat2 = double.parse(dateCheck2[dateCheck2.length-2]).toStringAsFixed(3);
-    String lng2 = double.parse(dateCheck2[dateCheck2.length-1]).toStringAsFixed(3);
+    String lat2 =
+        double.parse(dateCheck2[dateCheck2.length - 2]).toStringAsFixed(3);
+    String lng2 =
+        double.parse(dateCheck2[dateCheck2.length - 1]).toStringAsFixed(3);
 
     String todayDate = DateTime.now().toString();
     var tdCheck = todayDate.split(" ");
 
-    if(dateCheck[0] != tdCheck[0]){
-      if(lat1 == lat2 && lng1 == lng2){
+    if (dateCheck[0] != tdCheck[0]) {
+      if (lat1 == lat2 && lng1 == lng2) {
         found2 = true;
       }
     }
-
   }
 
   if (lat1 == lat2 && lng1 == lng2 && found == false) {
     int x = variable.data['count'];
     if (x == 2) {
       x = x + 1;
-      if(found2) {
-        var places = await Firestore.instance.collection('places')
-            .getDocuments();
+      if (found2) {
+        var places =
+            await Firestore.instance.collection('places').getDocuments();
         String newID = (places.documents.length + 1).toString();
         DateTime now = new DateTime.now();
         await DataBaseService(uid: newID).updatePlaceData(
@@ -144,7 +147,8 @@ Future execute(var inputData) async {
           variable.data['token'],
           "",
           variable.data['profileImage'],
-          x);
+          x,
+          variable.data['parent']);
     } else if (x > 2) {
     } else if (x < 2) {
       x = x + 1;
@@ -156,7 +160,8 @@ Future execute(var inputData) async {
           variable.data['token'],
           "",
           variable.data['profileImage'],
-          x);
+          x,
+          variable.data['parent']);
     }
   } else if (found == true) {
     await DataBaseService(uid: _list[0]).updateUserData(
@@ -167,7 +172,8 @@ Future execute(var inputData) async {
         variable.data['token'],
         "",
         variable.data['profileImage'],
-        3);
+        3,
+        variable.data['parent']);
   } else {
     await DataBaseService(uid: _list[0]).updateUserData(
         variable.data['uId'],
@@ -177,7 +183,8 @@ Future execute(var inputData) async {
         variable.data['token'],
         "",
         variable.data['profileImage'],
-        0);
+        0,
+        variable.data['parent']);
   }
 }
 
@@ -277,6 +284,13 @@ class Home_State extends State<Home> {
       }
     }
 
+    void permissionDenied(BuildContext context) {
+      Flushbar(
+        message: 'You do not have permission to that! You will have to ask your parent',
+        duration: Duration(seconds: 5),
+      )..show(context);
+    }
+
     return StreamProvider<List<UserData>>.value(
       value: DataBaseService().users,
       child: Scaffold(
@@ -336,15 +350,26 @@ class Home_State extends State<Home> {
             ListTile(
               title: Text('Approve Safe Locations'),
               leading: Icon(Icons.approval),
-              onTap: () {
-                _approveLocations();
+              onTap: () async {
+                DocumentSnapshot variable = await Firestore.instance
+                    .collection('users')
+                    .document(user.uid)
+                    .get();
+                if (variable.data['parent'] == true) {
+                  _approveLocations();
+                } else {
+                  Navigator.pop(context);
+                  permissionDenied(context);
+                }
               },
             ),
+            /*
             ListTile(
               title: Text('Reset Background Location'),
               leading: Icon(Icons.reset_tv),
               onTap: () {
-                /*
+
+
                 final user = Provider.of<User>(context);
                 Workmanager.cancelByTag("1");
                 Workmanager.initialize(callbackDispatcher,
@@ -353,9 +378,11 @@ class Home_State extends State<Home> {
                     //frequency: Duration(minutes: 16),
                     inputData: {'string': user.uid},
                     initialDelay: Duration(seconds: 5));
-                 */
+
               },
             )
+
+             */
           ],
         )),
         body: Column(

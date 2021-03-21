@@ -15,7 +15,7 @@ class DataBaseService {
   Firestore.instance.collection('places');
 
   Future updateUserData(String uId, String name, double lat, double lng,
-      String token, String message, String profileImage, int count) async {
+      String token, String message, String profileImage, int count,bool parent) async {
     return await userCollection.document(uid).setData({
       'uId': uId ?? '',
       'name': name ?? '',
@@ -25,6 +25,7 @@ class DataBaseService {
       'message': message ?? '',
       'profileImage': profileImage ?? '',
       'count': count ?? 0,
+      'parent' : parent ?? false,
     });
   }
 
