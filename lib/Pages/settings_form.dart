@@ -19,6 +19,7 @@ class _SettingsFormState extends State<SettingsForm> {
   int selectedIndex = 0;
   final _formKey = GlobalKey<FormState>();
   String _currentName;
+  String _currentNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +52,15 @@ class _SettingsFormState extends State<SettingsForm> {
                             : null,
                         onChanged: (val) => setState(() => _currentName = val),
                       ),
+                      TextFormField(
+                        initialValue: userData.number,
+                        decoration: textInputDecoration,
+                        validator: (val) =>
+                        val.isEmpty
+                            ? 'Please Enter a Phone Number'
+                            : null,
+                        onChanged: (val) => setState(() => _currentNumber = val),
+                      ),
                       SizedBox(height: 10.0),
                       Column(
                         children: [
@@ -82,7 +92,8 @@ class _SettingsFormState extends State<SettingsForm> {
                                           "",
                                           pictures[index],
                                           0,
-                                        userData.parent
+                                          userData.parent,
+                                          _currentNumber ?? userData.number
                                       );
                                       setState(() {
                                         selection = index;
@@ -121,7 +132,8 @@ class _SettingsFormState extends State<SettingsForm> {
                                     "",
                                     userData.profileImage,
                                     0,
-                                  userData.parent
+                                    userData.parent,
+                                    _currentNumber ?? userData.number
                                 );
                                 Navigator.pop(context);
                               }

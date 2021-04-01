@@ -81,12 +81,12 @@ class _approvalState extends State<approval> {
                 );
               }),
         ),
-        Row(
+        Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               RaisedButton(
-                child: Text('Yes'),
+                child: Text('Yes, Id consider this a place safe'),
                 onPressed: () async {
                   DocumentSnapshot variable = await Firestore.instance.collection('places').document(widget.id.toString()).get();
                   await DataBaseService(uid: widget.id)
@@ -101,7 +101,7 @@ class _approvalState extends State<approval> {
 
               ),
               RaisedButton(
-                child: Text('No'),
+                child: Text('No, I do not consider this place safe'),
                 onPressed: () async {
                   DocumentSnapshot variable = await Firestore.instance.collection('places').document(widget.id.toString()).get();
                   await DataBaseService(uid: widget.id)
@@ -110,7 +110,21 @@ class _approvalState extends State<approval> {
                     variable.data['lat'],
                     variable.data['lng'],
                     variable.data['day'],
-                    "x");
+                    "bad");
+                  Navigator.pop(context);
+                },
+              ),
+              RaisedButton(
+                child: Text('Im not familiar with this location'),
+                onPressed: () async {
+                  DocumentSnapshot variable = await Firestore.instance.collection('places').document(widget.id.toString()).get();
+                  await DataBaseService(uid: widget.id)
+                      .updatePlaceData(
+                      variable.data['name'],
+                      variable.data['lat'],
+                      variable.data['lng'],
+                      variable.data['day'],
+                      "x");
                   Navigator.pop(context);
                 },
               ),

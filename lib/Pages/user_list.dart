@@ -1,14 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:location/location.dart';
 import 'package:meet_in_the_middle/Pages/users.tile.dart';
-
 import 'package:meet_in_the_middle/models/users.dart';
-
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:provider/provider.dart';
-
 import 'map.dart';
 
 class UserList extends StatefulWidget {
@@ -19,7 +17,6 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   FirebaseAuth _auth;
   String userid;
-
 
   check(BuildContext context, List users) async {
     Location location = new Location();
@@ -34,15 +31,24 @@ class _UserListState extends State<UserList> {
       var spl = compare.split("_");
       if (spl[0] == "request" && userid == user.uid) {
         await DataBaseService(uid: user.uid).updateUserData(
-            user.uid, user.name, user.lat, user.lng, user.token, "",user.profileImage,0,user.parent);
+            user.uid,
+            user.name,
+            user.lat,
+            user.lng,
+            user.token,
+            "waiting",
+            user.profileImage,
+            0,
+            user.parent,
+            user.number);
         showGeneralDialog(
             barrierColor: Colors.black.withOpacity(0.5),
             transitionBuilder: (context, a1, a2, widget) {
-              final curvedValue = Curves.easeInOutBack.transform(a1.value) -
-                  1.0;
+              final curvedValue =
+                  Curves.easeInOutBack.transform(a1.value) - 1.0;
               return Transform(
-                transform: Matrix4.translationValues(
-                    0.0, curvedValue * 200, 0.0),
+                transform:
+                    Matrix4.translationValues(0.0, curvedValue * 200, 0.0),
                 child: Opacity(
                   opacity: a1.value,
                   child: AlertDialog(
@@ -52,28 +58,68 @@ class _UserListState extends State<UserList> {
                     content: Text('Someone has requested your location'),
                     actions: [
                       FlatButton(
-                        child: Text("Deny"),
-                        onPressed: () {
-                              Navigator.of(context).pop();
-                            }
-                      ),
+                          child: Text("Deny"),
+                          onPressed: () async {
+                            DocumentSnapshot variable = await Firestore.instance
+                                .collection('users')
+                                .document(userid)
+                                .get();
+                            await DataBaseService(uid: userid)
+                                .updateUserData(
+                                    variable.data['uId'],
+                                    variable.data['name'],
+                                    variable.data['lat'],
+                                    variable.data['lng'],
+                                    variable.data['token'],
+                                    "",
+                                    variable.data['profileImage'],
+                                    variable.data['count'],
+                                    variable.data['parent'],
+                                    variable.data['number'],);
+                            Navigator.of(context).pop();
+                          }),
                       FlatButton(
                         child: Text("Accept"),
                         onPressed: () async {
-                          for (var user2 in users) {
-                            if (user2.uid == spl[1]) {
-                              _serviceEnabled =
-                              await location.serviceEnabled();
+                              _serviceEnabled = await location.serviceEnabled();
                               _locationData = await location.getLocation();
-                              await DataBaseService(uid: user2.uid)
+                              DocumentSnapshot variable = await Firestore.instance
+                                  .collection('users')
+                                  .document(spl[1])
+                                  .get();
+                              await DataBaseService(uid: spl[1])
                                   .updateUserData(
-                                  user2.uid, user2.name, _locationData.latitude, _locationData.longitude,
-                                  user2.token,
-                                  "sent_" + user.lat.toString() + "_" +
-                                      user.lng.toString(),user2.profileImage,0,user2.parent);
+                                variable.data['uId'],
+                                variable.data['name'],
+                                variable.data['lat'],
+                                variable.data['lng'],
+                                variable.data['token'],
+                                "sent_" +
+                                    user.lat.toString() +
+                                    "_" +
+                                    user.lng.toString(),
+                                variable.data['profileImage'],
+                                variable.data['count'],
+                                variable.data['parent'],
+                                variable.data['number'],);
+
+                              DocumentSnapshot variable2 = await Firestore.instance
+                                  .collection('users')
+                                  .document(userid)
+                                  .get();
+                              await DataBaseService(uid: userid)
+                                  .updateUserData(
+                                variable2.data['uId'],
+                                variable2.data['name'],
+                                variable2.data['lat'],
+                                variable2.data['lng'],
+                                variable2.data['token'],
+                                "",
+                                variable2.data['profileImage'],
+                                variable2.data['count'],
+                                variable2.data['parent'],
+                                variable2.data['number'],);
                               Navigator.of(context).pop();
-                            }
-                          }
                         },
                       ),
                     ],
@@ -88,7 +134,16 @@ class _UserListState extends State<UserList> {
             pageBuilder: (context, animation1, animation2) {});
       } else if (spl[0] == "sent" && user.uid == userid) {
         await DataBaseService(uid: user.uid).updateUserData(
-            user.uid, user.name, user.lat, user.lng, user.token, "",user.profileImage,0,user.parent);
+            user.uid,
+            user.name,
+            user.lat,
+            user.lng,
+            user.token,
+            "",
+            user.profileImage,
+            0,
+            user.parent,
+            user.number);
         OpenMap(spl[1], spl[2]);
       }
     }
@@ -111,23 +166,22 @@ class _UserListState extends State<UserList> {
     check(context, users);
     UserData user;
     for (var u in users) {
-      if(userid == u.uid){
+      if (userid == u.uid) {
         user = u;
       }
     }
-    return
-      ListView.builder(
-          scrollDirection: Axis.vertical,
-          shrinkWrap: true,
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            if (users[index].uid != userid && users[index].token == user.token && users[index].token != "" ) {
-                  return UserTile(user: users[index]);
-            }else{
-              return Container();
-            }
+    return ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount: users.length,
+        itemBuilder: (context, index) {
+          if (users[index].uid != userid &&
+              users[index].token == user.token &&
+              users[index].token != "") {
+            return UserTile(user: users[index]);
+          } else {
+            return Container();
           }
-      );
+        });
   }
 }
-

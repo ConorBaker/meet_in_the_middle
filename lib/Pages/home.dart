@@ -16,7 +16,6 @@ import 'package:meet_in_the_middle/shared/join_family.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flushbar/flushbar.dart';
-import 'package:flushbar/flushbar_helper.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -148,7 +147,9 @@ Future execute(var inputData) async {
           "",
           variable.data['profileImage'],
           x,
-          variable.data['parent']);
+          variable.data['parent'],
+          variable.data['number']);
+
     } else if (x > 2) {
     } else if (x < 2) {
       x = x + 1;
@@ -161,7 +162,8 @@ Future execute(var inputData) async {
           "",
           variable.data['profileImage'],
           x,
-          variable.data['parent']);
+          variable.data['parent'],
+          variable.data['number']);
     }
   } else if (found == true) {
     await DataBaseService(uid: _list[0]).updateUserData(
@@ -173,7 +175,8 @@ Future execute(var inputData) async {
         "",
         variable.data['profileImage'],
         3,
-        variable.data['parent']);
+        variable.data['parent'],
+        variable.data['number']);
   } else {
     await DataBaseService(uid: _list[0]).updateUserData(
         variable.data['uId'],
@@ -184,7 +187,8 @@ Future execute(var inputData) async {
         "",
         variable.data['profileImage'],
         0,
-        variable.data['parent']);
+        variable.data['parent'],
+        variable.data['number']);
   }
 }
 
@@ -211,7 +215,7 @@ class Home_State extends State<Home> {
     Geolocator().checkGeolocationPermissionStatus();
     Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
     Workmanager.registerPeriodicTask("1", fetchBackground,
-        inputData: {'string': uid}, initialDelay: Duration(seconds: 5));
+        inputData: {'string': uid}, initialDelay: Duration(seconds: 10));
   }
 
   @override

@@ -15,7 +15,7 @@ class DataBaseService {
   Firestore.instance.collection('places');
 
   Future updateUserData(String uId, String name, double lat, double lng,
-      String token, String message, String profileImage, int count,bool parent) async {
+      String token, String message, String profileImage, int count,bool parent,String number) async {
     return await userCollection.document(uid).setData({
       'uId': uId ?? '',
       'name': name ?? '',
@@ -26,6 +26,7 @@ class DataBaseService {
       'profileImage': profileImage ?? '',
       'count': count ?? 0,
       'parent' : parent ?? false,
+      'number' : number ?? ''
     });
   }
 
@@ -51,6 +52,8 @@ class DataBaseService {
       message: snapshot.data['message'] ?? '',
       profileImage: snapshot.data['profileImage'] ?? '',
       count: snapshot.data['count'] ?? 0,
+      parent: snapshot.data['parent'] ?? false,
+      number: snapshot.data['number'] ?? ''
     );
   }
 
@@ -64,7 +67,10 @@ class DataBaseService {
           token: doc.data['token'] ?? '',
           message: doc.data['message'] ?? '',
           profileImage: doc.data['profileImage'] ?? '',
-          count: doc.data['count'] ?? 0);
+          count: doc.data['count'] ?? 0,
+          parent : doc.data['parent'] ?? false,
+          number : doc.data['number'] ?? '',
+      );
     }).toList();
   }
 
