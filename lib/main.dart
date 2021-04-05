@@ -11,7 +11,6 @@ FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   var initializationSettingsAndroid =
   AndroidInitializationSettings('app_icon');
   var initializationSettingsIOS = IOSInitializationSettings(
@@ -28,6 +27,7 @@ void main() async {
           debugPrint('notification payload: ' + payload);
         }
       });
+
   runApp(MyApp());
 }
 

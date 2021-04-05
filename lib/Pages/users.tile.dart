@@ -4,9 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/database.dart';
-import 'package:telephony/telephony.dart';
+//import 'package:telephony/telephony.dart';
 import 'map.dart';
 
 class UserTile extends StatelessWidget {
@@ -17,9 +18,12 @@ class UserTile extends StatelessWidget {
   FirebaseAuth _auth;
   String userid;
   String not = "";
-  final Telephony telephony = Telephony.instance;
+
+  List<String> recipents = [];
+
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
 
   @override
   Widget build(BuildContext context) {
@@ -67,11 +71,18 @@ class UserTile extends StatelessWidget {
                                 final FirebaseUser cUser =
                                     await _auth.currentUser();
                                 userid = cUser.uid;
-
+                                recipents = [];
+                                recipents.add(user.number);
+                                _sendSMS(user.name +
+                                    ", I have requested your location. Please visit your Meet in the Middle app to either confirm or deny my request.", recipents);
+                                /*
+                                final Telephony telephony = await Telephony.instance;
                                 telephony.sendSms(
                                     to: user.number,
                                     message: user.name +
                                         ", I have requested your location. Please visit your Meet in the Middle app to either confirm or deny my request.");
+
+                                 */
                                 await DataBaseService(uid: user.uid)
                                     .updateUserData(
                                         user.uid,
@@ -132,6 +143,14 @@ class UserTile extends StatelessWidget {
                 )),
           ),
         ));
+  }
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 
   showNotification() async {

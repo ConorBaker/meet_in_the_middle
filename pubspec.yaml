@@ -39,7 +39,7 @@ dependencies:
   workmanager: ^0.2.0
   geolocator: ^5.3.2+2
   background_location: ^0.3.0
-  telephony: ^0.0.9
+  flutter_sms: ^2.1.1
   flushbar: ^1.10.4
   dependencies:
   flutter_spinkit: "^4.0.0"

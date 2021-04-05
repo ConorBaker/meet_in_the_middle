@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -64,7 +65,7 @@ Future execute(var inputData) async {
       .getDocuments();
 
   int placeAmount = amount.documents.length + 1;
-  int lastWeek = 0;
+  int lastWeek = 1;
   //last 5 days
   if (placeAmount > 479) {
     lastWeek = (placeAmount - 479);
@@ -98,22 +99,27 @@ Future execute(var inputData) async {
         .document(lastWeek.toString())
         .get();
 
-    String dateCheck1 = l.data['data'];
-    var dateCheck2 = dateCheck1.split("/");
-    var dateCheck = dateCheck2[dateCheck2.length].split(" ");
-    String lat1 = userLocation.latitude.toStringAsFixed(3);
-    String lng1 = userLocation.longitude.toStringAsFixed(3);
-    String lat2 =
-        double.parse(dateCheck2[dateCheck2.length - 2]).toStringAsFixed(3);
-    String lng2 =
-        double.parse(dateCheck2[dateCheck2.length - 1]).toStringAsFixed(3);
+    if(l != null){
+      Map<dynamic, dynamic> map = l.data;
+      List list = map.values.toList();
+      String dateCheck1 = list[0];
+      var dateCheck2 = dateCheck1.split("/");
+      String date = dateCheck2[dateCheck2.length-1];
+      var dateCheck = date.split(" ");
+      String lat1 = userLocation.latitude.toStringAsFixed(3);
+      String lng1 = userLocation.longitude.toStringAsFixed(3);
+      String lat2 =
+      double.parse(dateCheck2[1]).toStringAsFixed(3);
+      String lng2 =
+      double.parse(dateCheck2[2]).toStringAsFixed(3);
 
-    String todayDate = DateTime.now().toString();
-    var tdCheck = todayDate.split(" ");
+      String todayDate = DateTime.now().toString();
+      var tdCheck = todayDate.split(" ");
 
-    if (dateCheck[0] != tdCheck[0]) {
-      if (lat1 == lat2 && lng1 == lng2) {
-        found2 = true;
+      if (dateCheck[0] != tdCheck[0]) {
+        if (lat1 == lat2 && lng1 == lng2) {
+          found2 = true;
+        }
       }
     }
   }
