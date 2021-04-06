@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:meet_in_the_middle/Pages/settings_form.dart';
 import 'package:meet_in_the_middle/Pages/user_list.dart';
 import 'package:meet_in_the_middle/models/user.dart';
@@ -15,7 +13,6 @@ import 'package:meet_in_the_middle/shared/currernt_login.dart';
 import 'package:meet_in_the_middle/shared/family_maker.dart';
 import 'package:meet_in_the_middle/shared/join_family.dart';
 import 'package:provider/provider.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:flushbar/flushbar.dart';
 
 class Home extends StatefulWidget {
@@ -23,211 +20,12 @@ class Home extends StatefulWidget {
   Home_State createState() => Home_State();
 }
 
-Future execute(var inputData) async {
-  Position userLocation = await Geolocator()
-      .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  var _list = inputData.values.toList();
-  DocumentSnapshot variable =
-      await Firestore.instance.collection('users').document(_list[0]).get();
-  String lat2 = variable.data['lat'].toStringAsFixed(3);
-  String lng2 = variable.data['lng'].toStringAsFixed(3);
-  String lat1 = userLocation.latitude.toStringAsFixed(3);
-  String lng1 = userLocation.longitude.toStringAsFixed(3);
-  List<Placemark> placemark = await Geolocator()
-      .placemarkFromCoordinates(userLocation.latitude, userLocation.longitude);
-
-  var placesCheck =
-      await Firestore.instance.collection('places').getDocuments();
-  int l = placesCheck.documents.length + 1;
-  bool found = false;
-  for (int i = 1; i < l; i++) {
-    DocumentSnapshot variable2 = await Firestore.instance
-        .collection('places')
-        .document(i.toString())
-        .get();
-    String name = variable2.data['name'];
-    if (name ==
-            placemark[0].name +
-                " " +
-                placemark[0].thoroughfare +
-                " " +
-                placemark[0].administrativeArea ||
-        lat1 == variable2.data['lat'].toStringAsFixed(3) &&
-            lng1 == variable2.data['lng'].toStringAsFixed(3)) {
-      found = true;
-    }
-  }
-
-  var amount = await Firestore.instance
-      .collection('users')
-      .document(_list[0])
-      .collection("locations")
-      .getDocuments();
-
-  int placeAmount = amount.documents.length + 1;
-  int lastWeek = 1;
-  //last 5 days
-  if (placeAmount > 479) {
-    lastWeek = (placeAmount - 479);
-  }
-
-  await Firestore.instance
-      .collection('users')
-      .document(_list[0])
-      .collection("locations")
-      .document(placeAmount.toString())
-      .setData({
-    "data": placemark[0].name +
-        "_" +
-        placemark[0].thoroughfare +
-        "_" +
-        placemark[0].administrativeArea +
-        "/" +
-        userLocation.latitude.toString() +
-        "/" +
-        userLocation.longitude.toString() +
-        "/" +
-        DateTime.now().toString()
-  });
-
-  bool found2 = false;
-  for (lastWeek; lastWeek < placeAmount - 1; lastWeek++) {
-    var l = await Firestore.instance
-        .collection('users')
-        .document(_list[0])
-        .collection("locations")
-        .document(lastWeek.toString())
-        .get();
-
-    if(l != null){
-      Map<dynamic, dynamic> map = l.data;
-      List list = map.values.toList();
-      String dateCheck1 = list[0];
-      var dateCheck2 = dateCheck1.split("/");
-      String date = dateCheck2[dateCheck2.length-1];
-      var dateCheck = date.split(" ");
-      String lat1 = userLocation.latitude.toStringAsFixed(3);
-      String lng1 = userLocation.longitude.toStringAsFixed(3);
-      String lat2 =
-      double.parse(dateCheck2[1]).toStringAsFixed(3);
-      String lng2 =
-      double.parse(dateCheck2[2]).toStringAsFixed(3);
-
-      String todayDate = DateTime.now().toString();
-      var tdCheck = todayDate.split(" ");
-
-      if (dateCheck[0] != tdCheck[0]) {
-        if (lat1 == lat2 && lng1 == lng2) {
-          found2 = true;
-        }
-      }
-    }
-  }
-
-  if (lat1 == lat2 && lng1 == lng2 && found == false) {
-    int x = variable.data['count'];
-    if (x == 2) {
-      x = x + 1;
-      if (found2) {
-        var places =
-            await Firestore.instance.collection('places').getDocuments();
-        String newID = (places.documents.length + 1).toString();
-        DateTime now = new DateTime.now();
-        await DataBaseService(uid: newID).updatePlaceData(
-            placemark[0].name +
-                " " +
-                placemark[0].thoroughfare +
-                " " +
-                placemark[0].administrativeArea,
-            userLocation.latitude,
-            userLocation.longitude,
-            now.toString(),
-            " ");
-      }
-      await DataBaseService(uid: _list[0]).updateUserData(
-          variable.data['uId'],
-          variable.data['name'],
-          userLocation.latitude,
-          userLocation.longitude,
-          variable.data['token'],
-          "",
-          variable.data['profileImage'],
-          x,
-          variable.data['parent'],
-          variable.data['number']);
-
-    } else if (x > 2) {
-    } else if (x < 2) {
-      x = x + 1;
-      await DataBaseService(uid: _list[0]).updateUserData(
-          variable.data['uId'],
-          variable.data['name'],
-          userLocation.latitude,
-          userLocation.longitude,
-          variable.data['token'],
-          "",
-          variable.data['profileImage'],
-          x,
-          variable.data['parent'],
-          variable.data['number']);
-    }
-  } else if (found == true) {
-    await DataBaseService(uid: _list[0]).updateUserData(
-        variable.data['uId'],
-        variable.data['name'],
-        userLocation.latitude,
-        userLocation.longitude,
-        variable.data['token'],
-        "",
-        variable.data['profileImage'],
-        3,
-        variable.data['parent'],
-        variable.data['number']);
-  } else {
-    await DataBaseService(uid: _list[0]).updateUserData(
-        variable.data['uId'],
-        variable.data['name'],
-        userLocation.latitude,
-        userLocation.longitude,
-        variable.data['token'],
-        "",
-        variable.data['profileImage'],
-        0,
-        variable.data['parent'],
-        variable.data['number']);
-  }
-}
-
-const fetchBackground = "fetchBackground";
-
-void callbackDispatcher() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  Workmanager.executeTask((task, inputData) async {
-    switch (task) {
-      case fetchBackground:
-        await execute(inputData);
-        break;
-    }
-    return Future.value(true);
-  });
-}
-
 class Home_State extends State<Home> {
   final AuthService _auth = AuthService();
   final Firestore db = Firestore.instance;
-
-  void main(String uid) {
-    Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    Geolocator().checkGeolocationPermissionStatus();
-    Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
-    Workmanager.registerPeriodicTask("1", fetchBackground,
-        inputData: {'string': uid}, initialDelay: Duration(seconds: 10));
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    main(user.uid);
     void _showSettingsPanel() {
       Navigator.pop(context);
       showModalBottomSheet(
@@ -301,6 +99,7 @@ class Home_State extends State<Home> {
       )..show(context);
     }
 
+
     return StreamProvider<List<UserData>>.value(
       value: DataBaseService().users,
       child: Scaffold(
@@ -373,26 +172,6 @@ class Home_State extends State<Home> {
                 }
               },
             ),
-            /*
-            ListTile(
-              title: Text('Reset Background Location'),
-              leading: Icon(Icons.reset_tv),
-              onTap: () {
-
-
-                final user = Provider.of<User>(context);
-                Workmanager.cancelByTag("1");
-                Workmanager.initialize(callbackDispatcher,
-                    isInDebugMode: false);
-                Workmanager.registerPeriodicTask("1", fetchBackground,
-                    //frequency: Duration(minutes: 16),
-                    inputData: {'string': user.uid},
-                    initialDelay: Duration(seconds: 5));
-
-              },
-            )
-
-             */
           ],
         )),
         body: Column(

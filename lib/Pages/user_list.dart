@@ -7,6 +7,7 @@ import 'package:meet_in_the_middle/Pages/users.tile.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:provider/provider.dart';
+import 'package:sms/sms.dart';
 import 'map.dart';
 
 class UserList extends StatefulWidget {
@@ -17,6 +18,9 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   FirebaseAuth _auth;
   String userid;
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   check(BuildContext context, List users) async {
     Location location = new Location();
@@ -64,62 +68,80 @@ class _UserListState extends State<UserList> {
                                 .collection('users')
                                 .document(userid)
                                 .get();
-                            await DataBaseService(uid: userid)
-                                .updateUserData(
-                                    variable.data['uId'],
-                                    variable.data['name'],
-                                    variable.data['lat'],
-                                    variable.data['lng'],
-                                    variable.data['token'],
-                                    "",
-                                    variable.data['profileImage'],
-                                    variable.data['count'],
-                                    variable.data['parent'],
-                                    variable.data['number'],);
+                            await DataBaseService(uid: userid).updateUserData(
+                              variable.data['uId'],
+                              variable.data['name'],
+                              variable.data['lat'],
+                              variable.data['lng'],
+                              variable.data['token'],
+                              "",
+                              variable.data['profileImage'],
+                              variable.data['count'],
+                              variable.data['parent'],
+                              variable.data['number'],
+                            );
+
+                            DocumentSnapshot variable2 = await Firestore
+                                .instance
+                                .collection('users')
+                                .document(spl[1])
+                                .get();
+                            await DataBaseService(uid: spl[1]).updateUserData(
+                              variable2.data['uId'],
+                              variable2.data['name'],
+                              variable2.data['lat'],
+                              variable2.data['lng'],
+                              variable2.data['token'],
+                              "no_" + "0" + "_" + "0",
+                              variable2.data['profileImage'],
+                              variable2.data['count'],
+                              variable2.data['parent'],
+                              variable2.data['number'],
+                            );
                             Navigator.of(context).pop();
                           }),
                       FlatButton(
                         child: Text("Accept"),
                         onPressed: () async {
-                              _serviceEnabled = await location.serviceEnabled();
-                              _locationData = await location.getLocation();
-                              DocumentSnapshot variable = await Firestore.instance
-                                  .collection('users')
-                                  .document(spl[1])
-                                  .get();
-                              await DataBaseService(uid: spl[1])
-                                  .updateUserData(
-                                variable.data['uId'],
-                                variable.data['name'],
-                                variable.data['lat'],
-                                variable.data['lng'],
-                                variable.data['token'],
-                                "sent_" +
-                                    user.lat.toString() +
-                                    "_" +
-                                    user.lng.toString(),
-                                variable.data['profileImage'],
-                                variable.data['count'],
-                                variable.data['parent'],
-                                variable.data['number'],);
+                          DocumentSnapshot variable = await Firestore.instance
+                              .collection('users')
+                              .document(spl[1])
+                              .get();
+                          _serviceEnabled = await location.serviceEnabled();
+                          _locationData = await location.getLocation();
+                          await DataBaseService(uid: spl[1]).updateUserData(
+                            variable.data['uId'],
+                            variable.data['name'],
+                            variable.data['lat'],
+                            variable.data['lng'],
+                            variable.data['token'],
+                            "sent_" +
+                                user.lat.toString() +
+                                "_" +
+                                user.lng.toString(),
+                            variable.data['profileImage'],
+                            variable.data['count'],
+                            variable.data['parent'],
+                            variable.data['number'],
+                          );
 
-                              DocumentSnapshot variable2 = await Firestore.instance
-                                  .collection('users')
-                                  .document(userid)
-                                  .get();
-                              await DataBaseService(uid: userid)
-                                  .updateUserData(
-                                variable2.data['uId'],
-                                variable2.data['name'],
-                                variable2.data['lat'],
-                                variable2.data['lng'],
-                                variable2.data['token'],
-                                "",
-                                variable2.data['profileImage'],
-                                variable2.data['count'],
-                                variable2.data['parent'],
-                                variable2.data['number'],);
-                              Navigator.of(context).pop();
+                          DocumentSnapshot variable2 = await Firestore.instance
+                              .collection('users')
+                              .document(userid)
+                              .get();
+                          await DataBaseService(uid: userid).updateUserData(
+                            variable2.data['uId'],
+                            variable2.data['name'],
+                            variable2.data['lat'],
+                            variable2.data['lng'],
+                            variable2.data['token'],
+                            "",
+                            variable2.data['profileImage'],
+                            variable2.data['count'],
+                            variable2.data['parent'],
+                            variable2.data['number'],
+                          );
+                          Navigator.of(context).pop();
                         },
                       ),
                     ],
@@ -144,7 +166,24 @@ class _UserListState extends State<UserList> {
             0,
             user.parent,
             user.number);
+        showNotification(
+            "Location request has been approved and is ready to view");
+        Navigator.of(context).pop();
         OpenMap(spl[1], spl[2]);
+      } else if (spl[0] == "no" && user.uid == userid) {
+        await DataBaseService(uid: user.uid).updateUserData(
+            user.uid,
+            user.name,
+            user.lat,
+            user.lng,
+            user.token,
+            "",
+            user.profileImage,
+            0,
+            user.parent,
+            user.number);
+        showNotification("Location request has been denied");
+        Navigator.of(context).pop();
       }
     }
   }
@@ -161,9 +200,9 @@ class _UserListState extends State<UserList> {
   int count = 0;
 
   @override
-  Widget build(BuildContext context) {
-    final users = Provider.of<List<UserData>>(context) ?? [];
-    check(context, users);
+  Widget build(BuildContext buildContext) {
+    final users = Provider.of<List<UserData>>(buildContext) ?? [];
+    check(buildContext, users);
     UserData user;
     for (var u in users) {
       if (userid == u.uid) {
@@ -178,10 +217,19 @@ class _UserListState extends State<UserList> {
           if (users[index].uid != userid &&
               users[index].token == user.token &&
               users[index].token != "") {
-            return UserTile(user: users[index]);
+            return UserTile(users[index]);
           } else {
             return Container();
           }
         });
+  }
+
+  showNotification(String message) async {
+    var android = AndroidNotificationDetails('id', 'channel ', 'description',
+        priority: Priority.High, importance: Importance.Max);
+    var iOS = IOSNotificationDetails();
+    var platform = new NotificationDetails(android, iOS);
+    await flutterLocalNotificationsPlugin
+        .show(0, 'Meet In The Middle', message, platform, payload: '');
   }
 }
