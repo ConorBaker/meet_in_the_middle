@@ -46,7 +46,52 @@ Future execute(var inputData) async {
             lat1 == variable2.data['lat'].toStringAsFixed(3) &&
             lng1 == variable2.data['lng'].toStringAsFixed(3)) {
       found = true;
-    }
+
+      String allpeople = variable2.data['people'];
+      bool attending = false;
+      String allPeople = variable2.data['people'];
+      String updatedPeople = allPeople;
+      if(allPeople != ""){
+        var people = allPeople.split("_");
+        for (int x = 0; x < people.length; x++) {
+          if (people[x] == variable.data['name']) {
+            attending = true;
+          }
+        }
+      }
+
+      if(!attending){
+        updatedPeople = allpeople + variable.data['name'] + "_";
+      }
+
+      await DataBaseService(uid: i.toString()).updatePlaceData(
+          variable2.data['name'],
+          variable2.data['lat'],
+          variable2.data['lng'],
+          variable2.data['day'],
+          variable2.data['picture'],
+          updatedPeople
+      );
+    }else{
+      String updatedPeople = "";
+      String allPeople = variable2.data['people'];
+      if(allPeople != ""){
+        var people = allPeople.split("_");
+        for (int x = 0; x < people.length; x++) {
+          if (people[x] != variable.data['name']) {
+            updatedPeople = updatedPeople + people[x] + "_";
+          }
+        }
+      }
+        await DataBaseService(uid: i.toString()).updatePlaceData(
+            variable2.data['name'],
+            variable2.data['lat'],
+            variable2.data['lng'],
+            variable2.data['day'],
+            variable2.data['picture'],
+            updatedPeople
+        );
+      }
   }
 
   var amount = await Firestore.instance
@@ -133,7 +178,8 @@ Future execute(var inputData) async {
             userLocation.latitude,
             userLocation.longitude,
             now.toString(),
-            " ");
+            " ",
+        "");
       }
       await DataBaseService(uid: currentUserId).updateUserData(
           variable.data['uId'],
@@ -175,6 +221,7 @@ Future execute(var inputData) async {
         variable.data['parent'],
         variable.data['number']);
   } else {
+    }
     await DataBaseService(uid: currentUserId).updateUserData(
         variable.data['uId'],
         variable.data['name'],
@@ -187,7 +234,7 @@ Future execute(var inputData) async {
         variable.data['parent'],
         variable.data['number']);
   }
-}
+
 
 
 const fetchBackground = "fetchBackground";
@@ -210,7 +257,7 @@ void main() async {
   Geolocator().checkGeolocationPermissionStatus();
   Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
   Workmanager.registerPeriodicTask("1", fetchBackground,
-      inputData: {}, initialDelay: Duration(minutes : 1));
+      inputData: {}, initialDelay: Duration(seconds : 30));
 
   var initializationSettingsAndroid =
   AndroidInitializationSettings('app_icon');

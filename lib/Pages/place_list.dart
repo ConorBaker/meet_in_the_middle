@@ -5,12 +5,16 @@ import 'package:meet_in_the_middle/models/place.dart';
 import 'package:provider/provider.dart';
 
 class PlaceList extends StatefulWidget {
+  final String nuetral;
+
+  PlaceList(this.nuetral);
+
   @override
   _PlaceListState createState() => _PlaceListState();
 }
 
 class _PlaceListState extends State<PlaceList> {
-  Place placeData;
+
   @override
   Widget build(BuildContext context) {
     final places = Provider.of<List<Place>>(context) ?? [];
@@ -19,10 +23,20 @@ class _PlaceListState extends State<PlaceList> {
         shrinkWrap: true,
         itemCount: places.length,
         itemBuilder: (context, index) {
-          if(places[index].picture != " " && places[index].picture != 'x'){
-            return PlaceTile(place: places[index]);
-          }else{
-            return Container();
+          if (widget.nuetral == "good") {
+            if (places[index].picture != " " &&
+                places[index].picture != 'x' &&
+                places[index].picture != 'assets/bad.png') {
+              return PlaceTile(place: places[index]);
+            } else {
+              return Container();
+            }
+          } else {
+            if (places[index].picture == "assets/bad.png") {
+              return PlaceTile(place: places[index]);
+            } else {
+              return Container();
+            }
           }
         });
   }

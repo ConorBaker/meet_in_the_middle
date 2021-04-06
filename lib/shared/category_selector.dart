@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meet_in_the_middle/Pages/home.dart';
+import 'package:meet_in_the_middle/Pages/view_bad_place.dart';
 import 'package:meet_in_the_middle/Pages/view_safe_places.dart';
 
 class CategorySelector extends StatefulWidget {
@@ -12,7 +13,7 @@ class CategorySelector extends StatefulWidget {
 }
 
 class _CategorySelectorState extends State<CategorySelector> {
-  final List<String> categories = ['Users','Places', 'Requests','Online'];
+  final List<String> categories = ['Users','Safe Places', 'No Go Zones'];
   @override
   Widget build(BuildContext context) {
     int selectedIndex = widget.selectedIndex;
@@ -43,7 +44,12 @@ class _CategorySelectorState extends State<CategorySelector> {
                   );
                   return safe_places();
                 }else if(index == 2){
-
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => bad_places()),
+                  );
+                  return bad_places();
                 }else if(index == 3){
 
                 }

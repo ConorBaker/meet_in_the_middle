@@ -27,7 +27,17 @@ class _approvalState extends State<approval> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> pictures = ['assets/home.png','assets/school.png','assets/restaurant.png', 'assets/bus.png','assets/shopping.png','assets/tree.png', 'assets/soccer.png','assets/bar.png','assets/church.png'];
+    final List<String> pictures = [
+      'assets/home.png',
+      'assets/school.png',
+      'assets/restaurant.png',
+      'assets/bus.png',
+      'assets/shopping.png',
+      'assets/tree.png',
+      'assets/soccer.png',
+      'assets/bar.png',
+      'assets/church.png'
+    ];
     int selection = 0;
     return Column(
       children: <Widget>[
@@ -42,10 +52,7 @@ class _approvalState extends State<approval> {
               padding: const EdgeInsets.all(20.0),
               child: TextFormField(
                 initialValue: widget.address,
-                validator: (val) =>
-                val.isEmpty
-                    ? 'Please Enter a Name'
-                    : null,
+                validator: (val) => val.isEmpty ? 'Please Enter a Name' : null,
                 onChanged: (val) => setState(() => _currentName = val),
               ),
             )
@@ -71,12 +78,13 @@ class _approvalState extends State<approval> {
                     padding: EdgeInsets.all(10),
                     child: CircleAvatar(
                         radius: 40.0,
-                        backgroundColor : index == selectedIndex ?  Color.fromRGBO(163, 217, 229, 1) : Colors.white,
+                        backgroundColor: index == selectedIndex
+                            ? Colors.grey
+                            : Colors.white,
                         child: CircleAvatar(
                           radius: 35.0,
                           backgroundImage: AssetImage(pictures[index]),
-                        )
-                    ),
+                        )),
                   ),
                 );
               }),
@@ -88,43 +96,51 @@ class _approvalState extends State<approval> {
               RaisedButton(
                 child: Text('Yes, Id consider this a place safe'),
                 onPressed: () async {
-                  DocumentSnapshot variable = await Firestore.instance.collection('places').document(widget.id.toString()).get();
-                  await DataBaseService(uid: widget.id)
-                      .updatePlaceData(
+                  DocumentSnapshot variable = await Firestore.instance
+                      .collection('places')
+                      .document(widget.id.toString())
+                      .get();
+                  await DataBaseService(uid: widget.id).updatePlaceData(
                       _currentName ?? variable.data['name'],
                       variable.data['lat'],
                       variable.data['lng'],
                       variable.data['day'],
-                      pictures[selectedIndex]);
+                      pictures[selectedIndex],
+                  "");
                   Navigator.pop(context);
                 },
-
               ),
               RaisedButton(
                 child: Text('No, I do not consider this place safe'),
                 onPressed: () async {
-                  DocumentSnapshot variable = await Firestore.instance.collection('places').document(widget.id.toString()).get();
-                  await DataBaseService(uid: widget.id)
-                      .updatePlaceData(
+                  DocumentSnapshot variable = await Firestore.instance
+                      .collection('places')
+                      .document(widget.id.toString())
+                      .get();
+                  await DataBaseService(uid: widget.id).updatePlaceData(
                       variable.data['name'],
-                    variable.data['lat'],
-                    variable.data['lng'],
-                    variable.data['day'],
-                    "bad");
+                      variable.data['lat'],
+                      variable.data['lng'],
+                      variable.data['day'],
+                      "assets/bad.png",
+                      "");
                   Navigator.pop(context);
                 },
               ),
               RaisedButton(
                 child: Text('Im not familiar with this location'),
                 onPressed: () async {
-                  DocumentSnapshot variable = await Firestore.instance.collection('places').document(widget.id.toString()).get();
-                  await DataBaseService(uid: widget.id)
-                      .updatePlaceData(
+                  DocumentSnapshot variable = await Firestore.instance
+                      .collection('places')
+                      .document(widget.id.toString())
+                      .get();
+                  await DataBaseService(uid: widget.id).updatePlaceData(
                       variable.data['name'],
                       variable.data['lat'],
                       variable.data['lng'],
                       variable.data['day'],
-                      "x");
+                      "x",
+                      "");
                   Navigator.pop(context);
                 },
               ),

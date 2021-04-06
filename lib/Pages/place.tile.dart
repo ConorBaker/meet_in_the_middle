@@ -6,12 +6,19 @@ class PlaceTile extends StatelessWidget {
 
   PlaceTile({this.place});
 
-  FirebaseAuth _auth;
-  String userid;
-  String not = "";
+ String userid;
+
+
 
   @override
   Widget build(BuildContext context) {
+    String attending = "";
+    if(place.people != null){
+      var allPeople = place.people.split("_");
+      for(int x = 0; x < allPeople.length; x++){
+        attending = attending + allPeople[x] + " ";
+      }
+    }
     return Padding(
         padding: EdgeInsets.only(top: 0.0),
         child: Card(
@@ -28,6 +35,8 @@ class PlaceTile extends StatelessWidget {
               fontSize: 19.0,
               fontWeight: FontWeight.w500,
             )),
+            subtitle: Text(attending),
+            trailing: Icon(Icons.more_vert),
           ),
         ));
   }

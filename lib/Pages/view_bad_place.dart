@@ -12,12 +12,12 @@ import 'package:meet_in_the_middle/shared/family_maker.dart';
 import 'package:meet_in_the_middle/shared/join_family.dart';
 import 'package:provider/provider.dart';
 
-class safe_places extends StatefulWidget {
+class bad_places extends StatefulWidget {
   @override
-  _safe_placesState createState() => _safe_placesState();
+  _bad_placesState createState() => _bad_placesState();
 }
 
-class _safe_placesState extends State<safe_places> {
+class _bad_placesState extends State<bad_places> {
   final AuthService _auth = AuthService();
   final Firestore db = Firestore.instance;
   @override
@@ -151,7 +151,7 @@ class _safe_placesState extends State<safe_places> {
             )),
         body: Column(
           children: <Widget>[
-            CategorySelector(1),
+            CategorySelector(2),
             Expanded(
               child: Container(
                   decoration: BoxDecoration(
@@ -159,8 +159,8 @@ class _safe_placesState extends State<safe_places> {
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(30),
                           topRight: Radius.circular(30))),
-                  child: PlaceList("good")
-                ),
+                  child: PlaceList("bad")
+              ),
             ),
           ],
         ),

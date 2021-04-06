@@ -115,6 +115,7 @@ class UserTile extends StatelessWidget {
                 fontSize: 19.0,
                 fontWeight: FontWeight.w500,
               )),
+          trailing: Icon(Icons.more_vert),
         ),
       ),
     );

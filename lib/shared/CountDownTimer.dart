@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:meet_in_the_middle/Pages/map.dart';
 import 'package:meet_in_the_middle/Pages/settings_form.dart';
+import 'package:meet_in_the_middle/models/SizeConfig.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/auth.dart';
 import 'package:meet_in_the_middle/services/database.dart';
@@ -94,6 +95,7 @@ class _CountDownTimerState extends State<CountDownTimer>
   @override
   Widget build(BuildContext context) {
     start();
+    SizeConfig().init(context);
     void _showSettingsPanel() {
       Navigator.pop(context);
       showModalBottomSheet(
@@ -242,7 +244,7 @@ class _CountDownTimerState extends State<CountDownTimer>
                           child: Container(),
                         ),
                         Padding(
-                          padding: EdgeInsets.all(25.0),
+                          padding: EdgeInsets.all(50.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
@@ -272,14 +274,16 @@ class _CountDownTimerState extends State<CountDownTimer>
                                               Text(
                                                 "Time remaining until \n" + widget.user.name +"'s  \n location is available",
                                                 style: TextStyle(
-                                                    fontSize: 20,
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
                                                     color: Colors.black),
                                                 textAlign: TextAlign.center,
                                               ),
                                               Text(
                                                 timerString,
                                                 style: TextStyle(
-                                                    fontSize: 95,
+                                                    fontSize: 80,
+                                                    fontWeight: FontWeight.bold,
                                                     color: Colors.black),
                                               ),
                                             ],
