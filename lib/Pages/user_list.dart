@@ -7,7 +7,7 @@ import 'package:meet_in_the_middle/Pages/users.tile.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:provider/provider.dart';
-import 'package:sms/sms.dart';
+//import 'package:sms/sms.dart';
 import 'map.dart';
 
 class UserList extends StatefulWidget {

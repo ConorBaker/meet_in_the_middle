@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:meet_in_the_middle/shared/CountDownTimer.dart';
-import 'package:sms/sms.dart';
+import 'package:flutter_sms/flutter_sms.dart';
+//import 'package:sms/sms.dart';
+
+
 
 class UserTile extends StatelessWidget {
   final UserData user;
@@ -64,14 +67,17 @@ class UserTile extends StatelessWidget {
                               userid = cUser.uid;
                               recipents = [];
                               recipents.add(user.number);
-
+                              String message =  user.name +
+                                  ", I have requested your location. Please visit your Meet in the Middle app to either confirm or deny my request.";
+                              _sendSMS(message, recipents);
+                              /*
                               SmsSender sender = new SmsSender();
                               String address = user.number;
                               sender.sendSms(new SmsMessage(
                                   address,
                                   user.name +
                                       ", I have requested your location. Please visit your Meet in the Middle app to either confirm or deny my request."));
-
+                               */
                               await DataBaseService(uid: user.uid)
                                   .updateUserData(
                                       user.uid,
@@ -113,4 +119,14 @@ class UserTile extends StatelessWidget {
       ),
     );
   }
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
+  }
 }
+
+

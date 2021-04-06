@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 class AuthService {

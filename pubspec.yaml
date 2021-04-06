@@ -38,10 +38,9 @@ dependencies:
   google_maps_flutter: ^0.5.21+15
   workmanager: ^0.2.0
   geolocator: ^5.3.2+2
-  background_location: ^0.3.0
-  sms_maintained: ^0.2.5
-  sms: ^0.2.0
+  background_location: ^0.4.1
   flushbar: ^1.10.4
+  flutter_sms: ^2.1.1
   quiver: ^2.1.5
   dependencies:
   flutter_spinkit: "^4.0.0"
