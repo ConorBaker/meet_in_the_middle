@@ -47,7 +47,6 @@ Future execute(var inputData) async {
             lng1 == variable2.data['lng'].toStringAsFixed(3)) {
       found = true;
 
-      String allpeople = variable2.data['people'];
       bool attending = false;
       String allPeople = variable2.data['people'];
       String updatedPeople = allPeople;
@@ -61,7 +60,7 @@ Future execute(var inputData) async {
       }
 
       if(!attending){
-        updatedPeople = allpeople + variable.data['name'] + "_";
+        updatedPeople = allPeople + variable.data['name'] + "_";
       }
 
       await DataBaseService(uid: i.toString()).updatePlaceData(
@@ -78,7 +77,7 @@ Future execute(var inputData) async {
       if(allPeople != ""){
         var people = allPeople.split("_");
         for (int x = 0; x < people.length; x++) {
-          if (people[x] != variable.data['name']) {
+          if (people[x] != variable.data['name'] && people[x] != "") {
             updatedPeople = updatedPeople + people[x] + "_";
           }
         }
@@ -221,7 +220,6 @@ Future execute(var inputData) async {
         variable.data['parent'],
         variable.data['number']);
   } else {
-    }
     await DataBaseService(uid: currentUserId).updateUserData(
         variable.data['uId'],
         variable.data['name'],
@@ -233,6 +231,7 @@ Future execute(var inputData) async {
         0,
         variable.data['parent'],
         variable.data['number']);
+    }
   }
 
 
