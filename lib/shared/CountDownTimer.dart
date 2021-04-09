@@ -259,8 +259,8 @@ class _CountDownTimerState extends State<CountDownTimer>
                                           child: CustomPaint(
                                               painter: CustomTimerPainter(
                                             animation: controller,
-                                            backgroundColor: Color.fromRGBO(163, 217, 229, 1),
-                                            color: Colors.blueGrey,
+                                            backgroundColor: Color.fromRGBO(73, 140, 166, 1),
+                                            color: Color.fromRGBO(59, 75, 126,1),
                                           )),
                                         ),
                                         Align(
@@ -274,15 +274,14 @@ class _CountDownTimerState extends State<CountDownTimer>
                                               Text(
                                                 "Time remaining until \n" + widget.user.name +"'s  \n location is available",
                                                 style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
                                                     color: Colors.black),
                                                 textAlign: TextAlign.center,
                                               ),
                                               Text(
                                                 timerString,
                                                 style: TextStyle(
-                                                    fontSize: 80,
+                                                    fontSize: 75,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.black),
                                               ),

@@ -256,7 +256,8 @@ void main() async {
   Geolocator().checkGeolocationPermissionStatus();
   Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
   Workmanager.registerPeriodicTask("1", fetchBackground,
-      inputData: {}, initialDelay: Duration(seconds : 30));
+      inputData: {}, initialDelay: Duration(seconds : 60),
+      frequency: Duration(minutes: 20));
 
   var initializationSettingsAndroid =
   AndroidInitializationSettings('app_icon');
