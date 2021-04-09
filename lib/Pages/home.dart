@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:meet_in_the_middle/Pages/settings_form.dart';
 import 'package:meet_in_the_middle/Pages/user_list.dart';
+import 'package:meet_in_the_middle/Pages/view_bad_place.dart';
+import 'package:meet_in_the_middle/Pages/view_safe_places.dart';
+import 'package:meet_in_the_middle/Pages/view_users.dart';
 import 'package:meet_in_the_middle/models/user.dart';
 import 'package:meet_in_the_middle/models/users.dart';
 import 'package:meet_in_the_middle/services/auth.dart';
@@ -176,15 +179,14 @@ class Home_State extends State<Home> {
         )),
         body: Column(
           children: <Widget>[
-            CategorySelector(0),
             Expanded(
-              child: Container(
-                  decoration: BoxDecoration(
-                      color: Color.fromRGBO(242, 243, 245, 1),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30))),
-                  child: UserList()),
+              child: PageView(
+                children: <Widget>[
+                  users(),
+                  safe_places(),
+                  bad_places(),
+                ],
+              )
             ),
           ],
         ),

@@ -24,37 +24,7 @@ class _CategorySelectorState extends State<CategorySelector> {
           scrollDirection: Axis.horizontal,
           itemCount: categories.length,
           itemBuilder: (BuildContext context, int index){
-            return GestureDetector(
-              onTap: (){
-                setState(() {
-                  selectedIndex = index;
-                });
-                if(index == 0){
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Home()),
-                  );
-                  return Home();
-                }else if(index == 1){
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => safe_places()),
-                  );
-                  return safe_places();
-                }else if(index == 2){
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => bad_places()),
-                  );
-                  return bad_places();
-                }else if(index == 3){
-
-                }
-              },
-              child: Padding(
+              return Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: 20.0,
                   vertical: 20,
@@ -65,7 +35,7 @@ class _CategorySelectorState extends State<CategorySelector> {
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2
                 ),),
-              ),
+
             );
           }),
     );
