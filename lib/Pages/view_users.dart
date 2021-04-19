@@ -11,8 +11,10 @@ import 'package:meet_in_the_middle/shared/category_selector.dart';
 import 'package:provider/provider.dart';
 
 class users extends StatefulWidget {
+
   @override
   usersState createState() => usersState();
+
 }
 
 class usersState extends State<users> {

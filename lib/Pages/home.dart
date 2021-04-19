@@ -26,8 +26,18 @@ class Home extends StatefulWidget {
 class Home_State extends State<Home> {
   final AuthService _auth = AuthService();
   final Firestore db = Firestore.instance;
+
+  PageController controller = PageController();
+  var currentPageValue = 0.0;
+
   @override
   Widget build(BuildContext context) {
+    controller.addListener(() {
+      setState(() {
+        currentPageValue = controller.page;
+      });
+    });
+
     final user = Provider.of<User>(context);
     void _showSettingsPanel() {
       Navigator.pop(context);
@@ -97,11 +107,11 @@ class Home_State extends State<Home> {
 
     void permissionDenied(BuildContext context) {
       Flushbar(
-        message: 'You do not have permission to that! You will have to ask your parent',
+        message:
+            'You do not have permission to that! You will have to ask your parent',
         duration: Duration(seconds: 5),
       )..show(context);
     }
-
 
     return StreamProvider<List<UserData>>.value(
       value: DataBaseService().users,
@@ -180,17 +190,17 @@ class Home_State extends State<Home> {
         body: Column(
           children: <Widget>[
             Expanded(
-              child: PageView(
-                children: <Widget>[
-                  users(),
-                  safe_places(),
-                  bad_places(),
-                ],
-              )
-            ),
+                child: PageView(
+              children: <Widget>[
+                users(),
+                safe_places(),
+                bad_places(),
+              ],
+            )),
           ],
         ),
       ),
     );
   }
+
 }
