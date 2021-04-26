@@ -31,14 +31,15 @@ class DataBaseService {
   }
 
   Future updatePlaceData(String name, double lat, double lng,
-      String day, String picture, String people) async {
+      String day, String picture, String people, String token) async {
     return await locationCollections.document(uid).setData({
       'name': name ?? '',
       'lat': lat ?? '',
       'lng': lng ?? '',
       'day': day ?? '',
       'picture': picture ?? '',
-      'people' : people ?? ''
+      'people' : people ?? '',
+      'token' : token ?? ''
     });
   }
 
@@ -83,7 +84,8 @@ class DataBaseService {
         lng: doc.data['lng'] ?? '',
         day: doc.data['day'] ?? '',
         picture: doc.data['picture'] ?? '',
-        people: doc.data['people'] ?? ''
+          people: doc.data['people'] ?? '',
+          token: doc.data['token'] ?? ''
       );
     }).toList();
   }

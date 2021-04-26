@@ -154,7 +154,7 @@ class _CountDownTimerState extends State<CountDownTimer>
                   padding: const EdgeInsets.all(20.0),
                   child: Container(
                     child: approval(
-                        id: i.toString(), address: variable.data['name']),
+                        id: i.toString(), address: variable.data['name'],),
                   ),
                 );
               });

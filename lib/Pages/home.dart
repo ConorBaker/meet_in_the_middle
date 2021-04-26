@@ -81,6 +81,7 @@ class Home_State extends State<Home> {
 
     Future<void> _approveLocations() async {
       Navigator.pop(context);
+      DocumentSnapshot variable2 = await Firestore.instance.collection('users').document(user.uid).get();
       var placesCheck =
           await Firestore.instance.collection('places').getDocuments();
       int l = placesCheck.documents.length + 1;
@@ -97,7 +98,7 @@ class Home_State extends State<Home> {
                   padding: const EdgeInsets.all(20.0),
                   child: Container(
                     child: approval(
-                        id: i.toString(), address: variable.data['name']),
+                        id: i.toString(), address: variable.data['name'],token : variable2.data['token']),
                   ),
                 );
               });
@@ -193,8 +194,8 @@ class Home_State extends State<Home> {
                 child: PageView(
               children: <Widget>[
                 users(),
-                safe_places(),
-                bad_places(),
+                safe_places(user.uid),
+                bad_places(user.uid),
               ],
             )),
           ],
@@ -202,5 +203,4 @@ class Home_State extends State<Home> {
       ),
     );
   }
-
 }

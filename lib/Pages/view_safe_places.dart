@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meet_in_the_middle/Pages/place_list.dart';
@@ -13,16 +14,17 @@ import 'package:meet_in_the_middle/shared/join_family.dart';
 import 'package:provider/provider.dart';
 
 class safe_places extends StatefulWidget {
+  final uid;
+
+  safe_places(this.uid);
+
   @override
   _safe_placesState createState() => _safe_placesState();
 }
 
 class _safe_placesState extends State<safe_places> {
-  final AuthService _auth = AuthService();
-  final Firestore db = Firestore.instance;
   @override
   Widget build(BuildContext context) {
-
     return StreamProvider<List<Place>>.value(
       value: DataBaseService().places,
       child: Scaffold(
@@ -37,7 +39,7 @@ class _safe_placesState extends State<safe_places> {
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(30),
                           topRight: Radius.circular(30))),
-                  child: PlaceList("good")
+                  child: PlaceList("good",widget.uid)
                 ),
             ),
           ],

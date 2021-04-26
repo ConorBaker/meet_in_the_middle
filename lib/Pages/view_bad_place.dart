@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meet_in_the_middle/Pages/place_list.dart';
@@ -13,16 +14,26 @@ import 'package:meet_in_the_middle/shared/join_family.dart';
 import 'package:provider/provider.dart';
 
 class bad_places extends StatefulWidget {
+  final uid;
+
+  bad_places(this.uid);
   @override
   _bad_placesState createState() => _bad_placesState();
 }
 
 class _bad_placesState extends State<bad_places> {
-  final AuthService _auth = AuthService();
   final Firestore db = Firestore.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  DocumentSnapshot variable;
+
+
+  Future<String> getToken() async{
+    final FirebaseUser user = await _auth.currentUser();
+    variable = await Firestore.instance.collection('users').document(user.uid).get();
+  }
   @override
   Widget build(BuildContext context) {
-
+    getToken();
 
     return StreamProvider<List<Place>>.value(
       value: DataBaseService().places,
@@ -38,7 +49,7 @@ class _bad_placesState extends State<bad_places> {
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(30),
                           topRight: Radius.circular(30))),
-                  child: PlaceList("bad")
+                  child: PlaceList("bad", widget.uid)
               ),
             ),
           ],

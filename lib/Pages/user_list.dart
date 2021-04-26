@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_sms/flutter_sms.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 import 'package:meet_in_the_middle/Pages/users.tile.dart';
 import 'package:meet_in_the_middle/models/users.dart';
@@ -239,18 +241,17 @@ class _UserListState extends State<UserList> {
               children: <Widget>[
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FlatButton(
                         child: Text("Request Location"),
                         onPressed: () {
                           showGeneralDialog(
                               barrierColor: Colors.black.withOpacity(0.5),
-                              transitionBuilder:
-                                  (context, a1, a2, widget) {
-                                final curvedValue = Curves.easeInOutBack
-                                    .transform(a1.value) -
-                                    1.0;
+                              transitionBuilder: (context, a1, a2, widget) {
+                                final curvedValue =
+                                    Curves.easeInOutBack.transform(a1.value) -
+                                        1.0;
                                 return Transform(
                                   transform: Matrix4.translationValues(
                                       0.0, curvedValue * 200, 0.0),
@@ -259,8 +260,7 @@ class _UserListState extends State<UserList> {
                                     child: AlertDialog(
                                       shape: OutlineInputBorder(
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              16.0)),
+                                              BorderRadius.circular(16.0)),
                                       title: Text(
                                           'You are about to request a location!'),
                                       content: Text(
@@ -271,45 +271,130 @@ class _UserListState extends State<UserList> {
                                         FlatButton(
                                             child: Text("No"),
                                             onPressed: () {
-                                              Navigator.of(buildContext)
-                                                  .pop();
+                                              Navigator.of(buildContext).pop();
                                             }),
                                         FlatButton(
                                           child: Text("Yes"),
                                           onPressed: () async {
-                                            Navigator.of(buildContext)
-                                                .pop();
+                                            bool good = false;
+                                            bool bad = false;
+                                            String address;
+                                            Navigator.of(buildContext).pop();
                                             _auth = FirebaseAuth.instance;
                                             final FirebaseUser cUser =
-                                            await _auth.currentUser();
+                                                await _auth.currentUser();
                                             userid = cUser.uid;
-                                            recipents = [];
-                                            recipents.add(users[index].number);
-                                            String message = users[index].name +
-                                                ", I have requested your location. Please visit your Meet in the Middle app to either confirm or deny my request.";
-                                            _sendSMS(message, recipents);
-                                            await DataBaseService(
-                                                uid: users[index].uid)
-                                                .updateUserData(
-                                                users[index].uid,
-                                                users[index].name,
-                                                users[index].lat,
-                                                users[index].lng,
-                                                users[index].token,
-                                                "request_" + userid,
-                                                users[index].profileImage,
-                                                0,
-                                                users[index].parent,
-                                                users[index].number);
 
-                                            Navigator.push(
-                                              buildContext,
-                                              MaterialPageRoute(
-                                                  builder:
-                                                      (buildContext) =>
-                                                      CountDownTimer(
-                                                          users[index])),
-                                            );
+                                            String lat1 = users[index]
+                                                .lat
+                                                .toStringAsFixed(3);
+                                            String lng1 = users[index]
+                                                .lng
+                                                .toStringAsFixed(3);
+
+                                            var placesCheck = await Firestore
+                                                .instance
+                                                .collection('places')
+                                                .getDocuments();
+                                            int l =
+                                                placesCheck.documents.length +
+                                                    1;
+
+                                            List<Placemark> placemark =
+                                                await Geolocator()
+                                                    .placemarkFromCoordinates(
+                                                        users[index].lat,
+                                                        users[index].lng);
+
+                                            address = placemark[0].name +
+                                                " " +
+                                                placemark[0].thoroughfare +
+                                                " " +
+                                                placemark[0].administrativeArea;
+                                            for (int i = 1; i < l; i++) {
+                                              DocumentSnapshot variable2 =
+                                                  await Firestore.instance
+                                                      .collection('places')
+                                                      .document(i.toString())
+                                                      .get();
+                                              String name =
+                                                  variable2.data['name'];
+                                              if (name ==
+                                                      placemark[0].name +
+                                                          " " +
+                                                          placemark[0]
+                                                              .thoroughfare +
+                                                          " " +
+                                                          placemark[0]
+                                                              .administrativeArea ||
+                                                  lat1 ==
+                                                          variable2.data['lat']
+                                                              .toStringAsFixed(
+                                                                  3) &&
+                                                      lng1 ==
+                                                          variable2.data['lng']
+                                                              .toStringAsFixed(
+                                                                  3)) {
+                                                if (variable2
+                                                            .data['picture'] !=
+                                                        " " &&
+                                                    variable2.data['picture'] !=
+                                                        'x' &&
+                                                    variable2.data['picture'] !=
+                                                        'assets/bad.png') {
+                                                  good = true;
+                                                } else if (variable2
+                                                        .data['picture']
+                                                        ==
+                                                    "assets/bad.png") {
+                                                  bad = true;
+                                                }
+                                              }
+                                            }
+
+                                            if (good) {
+                                              Flushbar(
+                                                message:
+                                                    'Do not worry your child is safe at ' + address,
+                                                duration: Duration(seconds: 8),
+                                              )..show(buildContext);
+                                            } else if (bad) {
+                                              Flushbar(
+                                                message:
+                                                'Oh no your child is somewhere they should not be, They are at ' + address,
+                                                duration: Duration(seconds: 8),
+                                              )..show(buildContext);
+                                            }
+                                            else {
+                                              recipents = [];
+                                              recipents.add(
+                                                  users[index].number);
+                                              String message = users[index]
+                                                  .name +
+                                                  ", I have requested your location. Please visit your Meet in the Middle app to either confirm or deny my request.";
+                                              _sendSMS(message, recipents);
+                                              await DataBaseService(
+                                                  uid: users[index].uid)
+                                                  .updateUserData(
+                                                  users[index].uid,
+                                                  users[index].name,
+                                                  users[index].lat,
+                                                  users[index].lng,
+                                                  users[index].token,
+                                                  "request_" + userid,
+                                                  users[index].profileImage,
+                                                  0,
+                                                  users[index].parent,
+                                                  users[index].number);
+
+                                              Navigator.push(
+                                                buildContext,
+                                                MaterialPageRoute(
+                                                    builder: (buildContext) =>
+                                                        CountDownTimer(
+                                                            users[index])),
+                                              );
+                                            }
                                           },
                                         ),
                                       ],
@@ -317,24 +402,21 @@ class _UserListState extends State<UserList> {
                                   ),
                                 );
                               },
-                              transitionDuration:
-                              Duration(milliseconds: 200),
+                              transitionDuration: Duration(milliseconds: 200),
                               barrierDismissible: true,
                               barrierLabel: '',
                               context: buildContext,
-                              pageBuilder: (buildContext, animation1,
-                                  animation2) {});
+                              pageBuilder:
+                                  (buildContext, animation1, animation2) {});
                         }),
                     FlatButton(
                       child: Text("View Location Graph"),
                       onPressed: () async {
-                        _populateGraph(buildContext,users[index]);
+                        _populateGraph(buildContext, users[index]);
                         Navigator.push(
                             buildContext,
                             MaterialPageRoute(
-                              builder:
-                                  (buildContext) =>
-                                  Loading(),
+                              builder: (buildContext) => Loading(),
                             ));
                         setState(() {
                           _collapse();
@@ -355,7 +437,7 @@ class _UserListState extends State<UserList> {
     int newKey;
     do {
       _key = new Random().nextInt(10000);
-    } while(newKey == _key);
+    } while (newKey == _key);
   }
 
   showNotification(String message) async {
@@ -367,20 +449,15 @@ class _UserListState extends State<UserList> {
         .show(0, 'Meet In The Middle', message, platform, payload: '');
   }
 
-
-  void _populateGraph(BuildContext buildContext,UserData user) async {
+  void _populateGraph(BuildContext buildContext, UserData user) async {
     var data = await fetchData(user);
     var keys = data.keys.toList();
     var values = data.values.toList();
-    if (data !=null ){
+    if (data != null) {
       Navigator.of(buildContext).pop();
       Navigator.push(
         buildContext,
-        MaterialPageRoute(
-            builder:
-                (buildContext) =>
-                Graph(
-                    user,keys,values)),
+        MaterialPageRoute(builder: (buildContext) => Graph(user, keys, values)),
       );
     }
   }
@@ -437,7 +514,12 @@ class _UserListState extends State<UserList> {
     List values = listForGraph.values.toList();
     List keys = listForGraph.keys.toList();
 
-    Map<String, int> rData = {keys[keys.length-1]: values[values.length-1], keys[keys.length-2]: values[values.length-2], keys[keys.length-3]: values[values.length-3], keys[keys.length-4]: values[values.length-4]};
+    Map<String, int> rData = {
+      keys[keys.length - 1]: values[values.length - 1],
+      keys[keys.length - 2]: values[values.length - 2],
+      keys[keys.length - 3]: values[values.length - 3],
+      keys[keys.length - 4]: values[values.length - 4]
+    };
 
     return rData;
   }

@@ -69,7 +69,8 @@ Future execute(var inputData) async {
           variable2.data['lng'],
           variable2.data['day'],
           variable2.data['picture'],
-          updatedPeople
+          updatedPeople,
+          variable.data['token']
       );
     }else{
       String updatedPeople = "";
@@ -88,7 +89,8 @@ Future execute(var inputData) async {
             variable2.data['lng'],
             variable2.data['day'],
             variable2.data['picture'],
-            updatedPeople
+            updatedPeople,
+            variable.data['token']
         );
       }
   }
@@ -178,7 +180,8 @@ Future execute(var inputData) async {
             userLocation.longitude,
             now.toString(),
             " ",
-        "");
+        "",
+            variable.data['token']);
       }
       await DataBaseService(uid: currentUserId).updateUserData(
           variable.data['uId'],

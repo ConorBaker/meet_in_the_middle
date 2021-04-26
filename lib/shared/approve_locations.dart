@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meet_in_the_middle/models/place.dart';
 import 'package:meet_in_the_middle/services/database.dart';
@@ -6,8 +7,9 @@ import 'package:meet_in_the_middle/services/database.dart';
 class approval extends StatefulWidget {
   final String id;
   final String address;
+  final String token;
 
-  approval({this.id, this.address});
+  approval({this.id, this.address,this.token});
 
   @override
   _approvalState createState() => _approvalState();
@@ -21,6 +23,20 @@ class _approvalState extends State<approval> {
         .get();
     return variable;
   }
+
+  Future<String> getUser() async {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final FirebaseUser cUser = await _auth.currentUser();
+    String currentUserId = cUser.uid;
+    DocumentSnapshot variable = await Firestore.instance
+        .collection('users')
+        .document(currentUserId)
+        .get();
+    String token = variable.data['token'];
+    return token;
+  }
+
+
 
   int selectedIndex = 0;
   String _currentName;
@@ -38,6 +54,10 @@ class _approvalState extends State<approval> {
       'assets/bar.png',
       'assets/church.png'
     ];
+
+
+
+
     int selection = 0;
     return Column(
       children: <Widget>[
@@ -105,8 +125,8 @@ class _approvalState extends State<approval> {
                       variable.data['lat'],
                       variable.data['lng'],
                       variable.data['day'],
-                      pictures[selectedIndex],
-                  "");
+                      pictures[selectedIndex], "", widget.token,
+                  );
                   Navigator.pop(context);
                 },
               ),
@@ -123,7 +143,7 @@ class _approvalState extends State<approval> {
                       variable.data['lng'],
                       variable.data['day'],
                       "assets/bad.png",
-                      "");
+                      "",widget.token);
                   Navigator.pop(context);
                 },
               ),
@@ -140,7 +160,7 @@ class _approvalState extends State<approval> {
                       variable.data['lng'],
                       variable.data['day'],
                       "x",
-                      "");
+                      "",widget.token);
                   Navigator.pop(context);
                 },
               ),
