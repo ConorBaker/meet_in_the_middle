@@ -450,16 +450,7 @@ class _UserListState extends State<UserList> {
   }
 
   void _populateGraph(BuildContext buildContext, UserData user) async {
-    var data = await fetchData(user);
-    var keys = data.keys.toList();
-    var values = data.values.toList();
-    if (data != null) {
-      Navigator.of(buildContext).pop();
-      Navigator.push(
-        buildContext,
-        MaterialPageRoute(builder: (buildContext) => Graph(user, keys, values)),
-      );
-    }
+    fetchData(user, buildContext);
   }
 
   void _sendSMS(String message, List<String> recipents) async {
@@ -470,7 +461,7 @@ class _UserListState extends State<UserList> {
     print(_result);
   }
 
-  Future<Map<String, int>> fetchData(UserData user) async {
+  void fetchData(UserData user,BuildContext buildContext) async {
     var amount = await Firestore.instance
         .collection('users')
         .document(user.uid)
@@ -479,48 +470,58 @@ class _UserListState extends State<UserList> {
 
     int placeAmount = amount.documents.length + 1;
     int lastWeek = 1;
-//last 5 days
-    if (placeAmount > 360) {
-      lastWeek = (placeAmount - 479);
+    //last 5 days
+    if (placeAmount > 672) {
+      lastWeek = (placeAmount - 672);
     }
     var listForGraph = Map();
-    for (lastWeek; lastWeek < placeAmount - 1; lastWeek++) {
-      var l = await Firestore.instance
-          .collection('users')
-          .document(user.uid)
-          .collection("locations")
-          .document(lastWeek.toString())
-          .get();
 
-      Map<dynamic, dynamic> map = l.data;
-      List list = map.values.toList();
-      String dateCheck1 = list[0];
-      var dateCheck2 = dateCheck1.split("/");
-      String placeName = dateCheck2[0];
+    CollectionReference _documentRef=Firestore.instance.collection('users')
+        .document(user.uid)
+        .collection("locations");
 
-      if (!listForGraph.containsKey(placeName)) {
-        listForGraph[placeName] = 1;
-      } else {
-        listForGraph[placeName] += 1;
+    _documentRef.getDocuments().then((ds){
+      if(ds!=null){
+        ds.documents.forEach((value){
+          if(int.parse(value.documentID) > lastWeek){
+            Map<dynamic, dynamic> map = value.data;
+            List list = map.values.toList();
+            String dateCheck1 = list[0];
+            var dateCheck2 = dateCheck1.split("/");
+            String placeName = dateCheck2[0];
+
+            if (!listForGraph.containsKey(placeName)) {
+              listForGraph[placeName] = 1;
+            } else {
+              listForGraph[placeName] += 1;
+            }
+          }
+        });
       }
-    }
+      var mapEntries = listForGraph.entries.toList()
+        ..sort((a, b) => a.value.compareTo(b.value));
+      listForGraph
+        ..clear()
+        ..addEntries(mapEntries);
 
-    var mapEntries = listForGraph.entries.toList()
-      ..sort((a, b) => a.value.compareTo(b.value));
-    listForGraph
-      ..clear()
-      ..addEntries(mapEntries);
+      List values = listForGraph.values.toList();
+      List keys = listForGraph.keys.toList();
 
-    List values = listForGraph.values.toList();
-    List keys = listForGraph.keys.toList();
-
-    Map<String, int> rData = {
-      keys[keys.length - 1]: values[values.length - 1],
-      keys[keys.length - 2]: values[values.length - 2],
-      keys[keys.length - 3]: values[values.length - 3],
-      keys[keys.length - 4]: values[values.length - 4]
-    };
-
-    return rData;
+      Map<String, int> rData = {
+        keys[keys.length - 1]: values[values.length - 1],
+        keys[keys.length - 2]: values[values.length - 2],
+        keys[keys.length - 3]: values[values.length - 3],
+        keys[keys.length - 4]: values[values.length - 4]
+      };
+      var key2 = rData.keys.toList();
+      var value2 = rData.values.toList();
+      if (rData != null) {
+        Navigator.of(buildContext).pop();
+        Navigator.push(
+          buildContext,
+          MaterialPageRoute(builder: (buildContext) => Graph(user, key2, value2)),
+        );
+      }
+    });
   }
 }

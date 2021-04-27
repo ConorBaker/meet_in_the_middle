@@ -7,7 +7,7 @@ class Place{
   final String people;
   final String token;
 
-
   Place({this.name, this.lat, this.lng, this.day,this.picture,this.people,this.token});
+
 
 }

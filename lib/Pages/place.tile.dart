@@ -36,7 +36,6 @@ class PlaceTile extends StatelessWidget {
               fontWeight: FontWeight.w500,
             )),
             subtitle: Text(attending),
-            trailing: Icon(Icons.more_vert),
           ),
         ));
   }

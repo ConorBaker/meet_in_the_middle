@@ -1,27 +1,33 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'file:///C:/Users/Conor/AndroidStudioProjects/meet_in_the_middle/lib/services/auth.dart';
 import 'package:meet_in_the_middle/Pages/wrapper.dart';
+import 'package:meet_in_the_middle/models/place.dart';
 import 'package:meet_in_the_middle/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'models/user.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
-
+    FlutterLocalNotificationsPlugin();
 
 Future execute(var inputData) async {
   Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  Position userLocation = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  Position userLocation = await Geolocator()
+      .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseUser cUser = await _auth.currentUser();
   String currentUserId = cUser.uid;
-  DocumentSnapshot variable = await Firestore.instance.collection('users').document(currentUserId).get();
+  List<DocumentSnapshot> places = [];
+  DocumentSnapshot variable = await Firestore.instance
+      .collection('users')
+      .document(currentUserId)
+      .get();
   String lat2 = variable.data['lat'].toStringAsFixed(3);
   String lng2 = variable.data['lng'].toStringAsFixed(3);
   String lat1 = userLocation.latitude.toStringAsFixed(3);
@@ -29,7 +35,7 @@ Future execute(var inputData) async {
   List<Placemark> placemark = await Geolocator()
       .placemarkFromCoordinates(userLocation.latitude, userLocation.longitude);
   var placesCheck =
-  await Firestore.instance.collection('places').getDocuments();
+      await Firestore.instance.collection('places').getDocuments();
   int l = placesCheck.documents.length + 1;
   bool found = false;
   for (int i = 1; i < l; i++) {
@@ -38,19 +44,22 @@ Future execute(var inputData) async {
         .document(i.toString())
         .get();
     String name = variable2.data['name'];
-    if (name == placemark[0].name +
-            " " +
-            placemark[0].thoroughfare +
-            " " +
-            placemark[0].administrativeArea ||
-            lat1 == variable2.data['lat'].toStringAsFixed(3) &&
+    if (name ==
+            placemark[0].name +
+                " " +
+                placemark[0].thoroughfare +
+                " " +
+                placemark[0].administrativeArea ||
+        lat1 == variable2.data['lat'].toStringAsFixed(3) &&
             lng1 == variable2.data['lng'].toStringAsFixed(3)) {
       found = true;
-
+      if(variable2.data['picture'] == 'assets/bad.png'){
+        places.add(variable2);
+      }
       bool attending = false;
       String allPeople = variable2.data['people'];
       String updatedPeople = allPeople;
-      if(allPeople != ""){
+      if (allPeople != "") {
         var people = allPeople.split("_");
         for (int x = 0; x < people.length; x++) {
           if (people[x] == variable.data['name']) {
@@ -59,7 +68,7 @@ Future execute(var inputData) async {
         }
       }
 
-      if(!attending){
+      if (!attending) {
         updatedPeople = allPeople + variable.data['name'] + "_";
       }
 
@@ -70,12 +79,11 @@ Future execute(var inputData) async {
           variable2.data['day'],
           variable2.data['picture'],
           updatedPeople,
-          variable.data['token']
-      );
-    }else{
+          variable.data['token']);
+    } else {
       String updatedPeople = "";
       String allPeople = variable2.data['people'];
-      if(allPeople != ""){
+      if (allPeople != "") {
         var people = allPeople.split("_");
         for (int x = 0; x < people.length; x++) {
           if (people[x] != variable.data['name'] && people[x] != "") {
@@ -83,16 +91,15 @@ Future execute(var inputData) async {
           }
         }
       }
-        await DataBaseService(uid: i.toString()).updatePlaceData(
-            variable2.data['name'],
-            variable2.data['lat'],
-            variable2.data['lng'],
-            variable2.data['day'],
-            variable2.data['picture'],
-            updatedPeople,
-            variable.data['token']
-        );
-      }
+      await DataBaseService(uid: i.toString()).updatePlaceData(
+          variable2.data['name'],
+          variable2.data['lat'],
+          variable2.data['lng'],
+          variable2.data['day'],
+          variable2.data['picture'],
+          updatedPeople,
+          variable.data['token']);
+    }
   }
 
   var amount = await Firestore.instance
@@ -136,19 +143,17 @@ Future execute(var inputData) async {
         .document(lastWeek.toString())
         .get();
 
-    if(l != null){
+    if (l != null) {
       Map<dynamic, dynamic> map = l.data;
       List list = map.values.toList();
       String dateCheck1 = list[0];
       var dateCheck2 = dateCheck1.split("/");
-      String date = dateCheck2[dateCheck2.length-1];
+      String date = dateCheck2[dateCheck2.length - 1];
       var dateCheck = date.split(" ");
       String lat1 = userLocation.latitude.toStringAsFixed(3);
       String lng1 = userLocation.longitude.toStringAsFixed(3);
-      String lat2 =
-      double.parse(dateCheck2[1]).toStringAsFixed(3);
-      String lng2 =
-      double.parse(dateCheck2[2]).toStringAsFixed(3);
+      String lat2 = double.parse(dateCheck2[1]).toStringAsFixed(3);
+      String lng2 = double.parse(dateCheck2[2]).toStringAsFixed(3);
 
       String todayDate = DateTime.now().toString();
       var tdCheck = todayDate.split(" ");
@@ -167,7 +172,7 @@ Future execute(var inputData) async {
       x = x + 1;
       if (found2) {
         var places =
-        await Firestore.instance.collection('places').getDocuments();
+            await Firestore.instance.collection('places').getDocuments();
         String newID = (places.documents.length + 1).toString();
         DateTime now = new DateTime.now();
         await DataBaseService(uid: newID).updatePlaceData(
@@ -180,7 +185,7 @@ Future execute(var inputData) async {
             userLocation.longitude,
             now.toString(),
             " ",
-        "",
+            "",
             variable.data['token']);
       }
       await DataBaseService(uid: currentUserId).updateUserData(
@@ -194,7 +199,6 @@ Future execute(var inputData) async {
           x,
           variable.data['parent'],
           variable.data['number']);
-
     } else if (x > 2) {
     } else if (x < 2) {
       x = x + 1;
@@ -211,6 +215,33 @@ Future execute(var inputData) async {
           variable.data['number']);
     }
   } else if (found == true) {
+    if (variable.data['parent'] == true) {
+      CollectionReference _documentRef = Firestore.instance.collection("users");
+      _documentRef.getDocuments().then((ds) {
+        if (ds != null) {
+          for (int c = 0; c < places.length; c++) {
+            ds.documents.forEach((value) {
+              var place = places[c];
+              String placeLat = place.data['lat'].toStringAsFixed(3);
+              String placeLng = place.data['lng'].toStringAsFixed(3);
+              String userLat = value.data['lat'].toStringAsFixed(3);
+              String userLng = value.data['lng'].toStringAsFixed(3);
+
+              if ((placeLat == userLat && placeLng == userLng)) {
+                if (place.data['picture'] == 'assets/bad.png') {
+                  if(variable.data['name'] != value.data['name'] && value.data['token'] == variable.data['token']){
+                    showNotification(value.data['name'] +
+                        " is in " + place.data['name'],value.data['name'] + " is in a place they shouldn't be"
+                    );
+                  }
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+
     await DataBaseService(uid: currentUserId).updateUserData(
         variable.data['uId'],
         variable.data['name'],
@@ -234,10 +265,8 @@ Future execute(var inputData) async {
         0,
         variable.data['parent'],
         variable.data['number']);
-    }
   }
-
-
+}
 
 const fetchBackground = "fetchBackground";
 
@@ -259,11 +288,11 @@ void main() async {
   Geolocator().checkGeolocationPermissionStatus();
   Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
   Workmanager.registerPeriodicTask("1", fetchBackground,
-      inputData: {}, initialDelay: Duration(seconds : 60),
+      inputData: {},
+      initialDelay: Duration(seconds: 30),
       frequency: Duration(minutes: 20));
 
-  var initializationSettingsAndroid =
-  AndroidInitializationSettings('app_icon');
+  var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
   var initializationSettingsIOS = IOSInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -274,23 +303,31 @@ void main() async {
       initializationSettingsAndroid, initializationSettingsIOS);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: (String payload) async {
-        if (payload != null) {
-          debugPrint('notification payload: ' + payload);
-        }
-      });
+    if (payload != null) {
+      debugPrint('notification payload: ' + payload);
+    }
+  });
 
   runApp(MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<User>.value(
       value: AuthService().user,
-        child: MaterialApp(
-          home: Wrapper(),
+      child: MaterialApp(
+        home: Wrapper(),
       ),
     );
   }
+}
+
+showNotification(String message,title) async {
+  var android = AndroidNotificationDetails('id', 'channel ', 'description',
+      priority: Priority.High, importance: Importance.Max);
+  var iOS = IOSNotificationDetails();
+  var platform = new NotificationDetails(android, iOS);
+  await flutterLocalNotificationsPlugin
+      .show(0, title , message, platform, payload: '');
 }

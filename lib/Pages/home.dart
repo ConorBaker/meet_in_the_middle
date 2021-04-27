@@ -79,18 +79,28 @@ class Home_State extends State<Home> {
           });
     }
 
+    void noneToAdd(BuildContext context) {
+      Flushbar(
+        message:
+        'There are no locations to add at the moment! Continue to use the app and check back after a few days.',
+        duration: Duration(seconds: 10),
+      )..show(context);
+    }
+
     Future<void> _approveLocations() async {
       Navigator.pop(context);
       DocumentSnapshot variable2 = await Firestore.instance.collection('users').document(user.uid).get();
       var placesCheck =
           await Firestore.instance.collection('places').getDocuments();
       int l = placesCheck.documents.length + 1;
+      bool found = false;
       for (int i = 1; i < l; i++) {
         DocumentSnapshot variable = await Firestore.instance
             .collection('places')
             .document(i.toString())
             .get();
         if (variable.data['picture'] == " ") {
+          found = true;
           showModalBottomSheet(
               context: context,
               builder: (BuildContext bc) {
@@ -104,6 +114,9 @@ class Home_State extends State<Home> {
               });
         }
       }
+      if(!found){
+        noneToAdd(context);
+      }
     }
 
     void permissionDenied(BuildContext context) {
@@ -113,6 +126,8 @@ class Home_State extends State<Home> {
         duration: Duration(seconds: 5),
       )..show(context);
     }
+
+
 
     return StreamProvider<List<UserData>>.value(
       value: DataBaseService().users,
