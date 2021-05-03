@@ -67,8 +67,7 @@ Future execute(var inputData) async {
           }
         }
       }
-
-      if (!attending) {
+      if (!attending && variable.data['token'] == variable2.data['token']) {
         updatedPeople = allPeople + variable.data['name'] + "_";
       }
 
@@ -86,7 +85,7 @@ Future execute(var inputData) async {
       if (allPeople != "") {
         var people = allPeople.split("_");
         for (int x = 0; x < people.length; x++) {
-          if (people[x] != variable.data['name'] && people[x] != "") {
+          if (people[x] != variable.data['name'] && people[x] != "" ) {
             updatedPeople = updatedPeople + people[x] + "_";
           }
         }
