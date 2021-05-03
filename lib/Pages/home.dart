@@ -99,7 +99,7 @@ class Home_State extends State<Home> {
             .collection('places')
             .document(i.toString())
             .get();
-        if (variable.data['picture'] == " ") {
+        if (variable.data['picture'] == " " && variable.data['token'] == variable2.data['token']) {
           found = true;
           showModalBottomSheet(
               context: context,

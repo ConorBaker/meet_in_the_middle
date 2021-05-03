@@ -44,6 +44,9 @@ Future execute(var inputData) async {
         .document(i.toString())
         .get();
     String name = variable2.data['name'];
+    if(variable2.data['picture'] == 'assets/bad.png'){
+      places.add(variable2);
+    }
     if (name ==
             placemark[0].name +
                 " " +
@@ -53,9 +56,6 @@ Future execute(var inputData) async {
         lat1 == variable2.data['lat'].toStringAsFixed(3) &&
             lng1 == variable2.data['lng'].toStringAsFixed(3)) {
       found = true;
-      if(variable2.data['picture'] == 'assets/bad.png'){
-        places.add(variable2);
-      }
       bool attending = false;
       String allPeople = variable2.data['people'];
       String updatedPeople = allPeople;
@@ -100,6 +100,33 @@ Future execute(var inputData) async {
           updatedPeople,
           variable.data['token']);
     }
+  }
+
+  if (variable.data['parent'] == true) {
+    CollectionReference _documentRef = Firestore.instance.collection("users");
+    _documentRef.getDocuments().then((ds) {
+      if (ds != null) {
+        for (int c = 0; c < places.length; c++) {
+          ds.documents.forEach((value) {
+            var place = places[c];
+            String placeLat = place.data['lat'].toStringAsFixed(3);
+            String placeLng = place.data['lng'].toStringAsFixed(3);
+            String userLat = value.data['lat'].toStringAsFixed(3);
+            String userLng = value.data['lng'].toStringAsFixed(3);
+
+            if ((placeLat == userLat && placeLng == userLng)) {
+              if (place.data['picture'] == 'assets/bad.png') {
+                if(variable.data['name'] != value.data['name'] && value.data['token'] == variable.data['token']){
+                  showNotification(value.data['name'] +
+                      " is in " + place.data['name'],value.data['name'] + " is in a place they shouldn't be"
+                  );
+                }
+              }
+            }
+          });
+        }
+      }
+    });
   }
 
   var amount = await Firestore.instance
@@ -215,33 +242,6 @@ Future execute(var inputData) async {
           variable.data['number']);
     }
   } else if (found == true) {
-    if (variable.data['parent'] == true) {
-      CollectionReference _documentRef = Firestore.instance.collection("users");
-      _documentRef.getDocuments().then((ds) {
-        if (ds != null) {
-          for (int c = 0; c < places.length; c++) {
-            ds.documents.forEach((value) {
-              var place = places[c];
-              String placeLat = place.data['lat'].toStringAsFixed(3);
-              String placeLng = place.data['lng'].toStringAsFixed(3);
-              String userLat = value.data['lat'].toStringAsFixed(3);
-              String userLng = value.data['lng'].toStringAsFixed(3);
-
-              if ((placeLat == userLat && placeLng == userLng)) {
-                if (place.data['picture'] == 'assets/bad.png') {
-                  if(variable.data['name'] != value.data['name'] && value.data['token'] == variable.data['token']){
-                    showNotification(value.data['name'] +
-                        " is in " + place.data['name'],value.data['name'] + " is in a place they shouldn't be"
-                    );
-                  }
-                }
-              }
-            });
-          }
-        }
-      });
-    }
-
     await DataBaseService(uid: currentUserId).updateUserData(
         variable.data['uId'],
         variable.data['name'],

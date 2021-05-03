@@ -341,12 +341,12 @@ class _UserListState extends State<UserList> {
                                                     variable2.data['picture'] !=
                                                         'x' &&
                                                     variable2.data['picture'] !=
-                                                        'assets/bad.png') {
+                                                        'assets/bad.png' &&  users[index].token == variable2.data['token'] ) {
                                                   good = true;
                                                 } else if (variable2
                                                         .data['picture']
                                                         ==
-                                                    "assets/bad.png") {
+                                                    "assets/bad.png" && users[index].token == variable2.data['token']) {
                                                   bad = true;
                                                 }
                                               }
